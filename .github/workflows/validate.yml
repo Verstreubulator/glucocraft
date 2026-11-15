@@ -13,13 +13,27 @@ permissions: {}
 
 jobs:
   validate-hacs:
-    # HACS validates public repositories only: while the repository is private the job is skipped, not failed
-    if: ${{ !github.event.repository.private }}
     runs-on: "ubuntu-latest"
+    permissions:
+      contents: read # to read the repository's visibility while it is private
     steps:
+      # HACS validates public repositories only: while the repository is private, the validation step is skipped.
+      # The visibility is asked of GitHub for every trigger (a scheduled run's event does not name the repository);
+      # an answer other than true or false fails the job rather than skipping the validation unnoticed.
+      - name: Repository visibility
+        id: visibility
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        run: |
+          private="$(gh api "repos/$GITHUB_REPOSITORY" --jq .private)"
+          case "$private" in
+            true|false) echo "private=$private" >> "$GITHUB_OUTPUT" ;;
+            *) echo "The repository's visibility could not be read: '$private'"; exit 1 ;;
+          esac
       # The project's own validator, on its moving branch on purpose: it must check against HACS's current rules,
       # which a pinned version would not follow.
       - name: HACS validation
+        if: steps.visibility.outputs.private == 'false'
         uses: "hacs/action@main"
         with:
           category: "integration"
