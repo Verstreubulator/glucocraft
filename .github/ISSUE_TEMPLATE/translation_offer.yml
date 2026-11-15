@@ -1,0 +1,39 @@
+name: Translation offer
+description: An offer to translate GlucoCraft's texts into a language.
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Translations are welcome. The language catalogues, the fit check for the wall panels and the approved
+        shorter terms are described in CONTRIBUTING.md, "Translations"; the translation itself comes as a pull
+        request. Issues are public: do not include health information, names, addresses, tokens or passwords.
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: The language and, where it matters, the country (for example Portuguese, Brazil).
+    validations:
+      required: true
+  - type: input
+    id: code
+    attributes:
+      label: Language code
+      description: The code that Home Assistant uses for the language.
+      placeholder: pt-BR
+    validations:
+      required: true
+  - type: checkboxes
+    id: parts
+    attributes:
+      label: Parts offered
+      options:
+        - label: The integration and the dashboard (i18n catalogues)
+        - label: Home Assistant's screens (translations file)
+        - label: The wall panels (panel catalogue and fit check)
+        - label: The Documentation page
+  - type: textarea
+    id: experience
+    attributes:
+      label: Experience with the language and the subject
+      description: For example medical or technical translation, or diabetes terminology in this language. No personal data.

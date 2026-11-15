@@ -1,0 +1,965 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "GlucoCraft Disclaimer",
+                "description": "{disclaimer}"
+            },
+            "kept": {
+                "title": "Readings from an Earlier Installation",
+                "description": "Readings from an earlier installation were found: {count} readings from {first} to {last}.",
+                "data": {
+                    "kept_readings": "Readings from the earlier installation"
+                },
+                "data_description": {
+                    "kept_readings": "Keep them: GlucoCraft uses them again from its first start, with the laboratory A1C results and the sensor changes kept with them. Delete them and start fresh: they are deleted when this setup ends, and GlucoCraft starts with the history that Home Assistant's recorder still holds. The settings of the earlier installation were not kept: either way, this setup starts with the default settings. Nothing changes until this setup ends."
+                }
+            },
+            "source": {
+                "title": "Glucose Sources",
+                "description": "Select the sensor entity that provides the glucose readings and, optionally, the entities that belong to it. GlucoCraft's own entities are not offered and not accepted as sources.\n\nGlucoCraft is designed for readings every 5 minutes or more often. With 15-minute or longer intervals the trend arrow, the 5-minute delta, the no-current-data limit, gaps and Sensor active (data received by GlucoCraft) are not designed to function as described; the readings are still stored and shown. Home Assistant shows a repair notice when a source updates every 15 minutes or less often.\n\n**Sensor lower and upper limit** (per source): The sensor limits must match the CGM sensor's measurement range. GlucoCraft sets them from the source where it can and shows a Repairs notice when the readings point to a different limit; otherwise they are set by hand (Documentation: *Readings Outside the Sensor's Range*). A reading beyond a limit, or one that the CGM system shows as LO or HI, is shown as LO or HI, left out of the values and counted as very low or very high; with a limit set by hand, a reading at the limit as well. A change applies to later readings. This method is a GlucoCraft rule. It is the user's responsibility to know their CGM system and to adjust these settings where necessary.",
+                "data": {
+                    "glucose_entity": "Primary glucose source",
+                    "sensor_expiry_entity": "CGM sensor expiry entity",
+                    "sensor_lower_limit": "Sensor lower limit",
+                    "sensor_upper_limit": "Sensor upper limit",
+                    "stale_threshold": "No current data after"
+                },
+                "data_description": {
+                    "glucose_entity": "The sensor entity whose state is the glucose value of the CGM system, in mg/dL or mmol/L, with that unit as its unit of measurement. GlucoCraft stores, calculates and shows the readings of this source and, where set, of the second source.",
+                    "sensor_expiry_entity": "Optional. An entity whose state is the CGM sensor's expiry (a date and time, a date or a time stamp) or the time remaining in days, hours or minutes. Without it, the sensor expiry and the expiry-based warm-up detection are not available. After the stated expiry the status shows *Sensor expired* in red; while readings still arrive, the value keeps the color of its zone, with its age, and the trend follows the readings.",
+                    "sensor_lower_limit": "The lowest value the CGM sensor measures. *Automatic*: 40 mg/dL (2.2 mmol/L), or 50 mg/dL (2.8 mmol/L) when the source shows a \"Below 50\" text or is one of the integrations listed in the Documentation section *Readings Outside the Sensor's Range* (on the GlucoCraft dashboard, after the setup).",
+                    "sensor_upper_limit": "The highest value the CGM sensor measures. *Automatic*: the limit the source shows (\"Above\" texts or a code number), 400 mg/dL (22.2 mmol/L) for the integrations listed in the Documentation section *Readings Outside the Sensor's Range* (on the GlucoCraft dashboard, after the setup), otherwise 500 mg/dL (27.8 mmol/L).",
+                    "stale_threshold": "The minutes without a new reading after which GlucoCraft shows *no current data* (5 to 30 minutes; default 15 minutes). The Documentation section *Gaps, Reading Interval and No Current Data* (on the GlucoCraft dashboard, after the setup) explains the default and what the screens then show."
+                },
+                "sections": {
+                    "second_source": {
+                        "name": "Second glucose source",
+                        "description": "Optional. A second source is designed to supply readings that the primary source misses, up to 24 hours back, and to continue when it stops, merged by measurement time; for example, a second system that reads the same CGM sensor (a different sensor supplies its own values).",
+                        "data": {
+                            "secondary_glucose_entity": "Second glucose source",
+                            "secondary_sensor_lower_limit": "Sensor lower limit",
+                            "secondary_sensor_upper_limit": "Sensor upper limit"
+                        },
+                        "data_description": {
+                            "secondary_glucose_entity": "Optional. The sensor entity of the second system, in mg/dL or mmol/L; GlucoCraft's own entities are not accepted.",
+                            "secondary_sensor_lower_limit": "The lowest value the CGM sensor measures. *Automatic*: 40 mg/dL (2.2 mmol/L), or 50 mg/dL (2.8 mmol/L) when the source shows a \"Below 50\" text or is one of the integrations listed in the Documentation section *Readings Outside the Sensor's Range* (on the GlucoCraft dashboard, after the setup).",
+                            "secondary_sensor_upper_limit": "The highest value the CGM sensor measures. *Automatic*: the limit the source shows (\"Above\" texts or a code number), 400 mg/dL (22.2 mmol/L) for the integrations listed in the Documentation section *Readings Outside the Sensor's Range* (on the GlucoCraft dashboard, after the setup), otherwise 500 mg/dL (27.8 mmol/L)."
+                        }
+                    }
+                }
+            },
+            "finish": {
+                "title": "Units and Notifications",
+                "description": "The display unit, the daily summary, the dashboard in the sidebar and the phones. Every setting can be changed later under Settings > Devices & services > GlucoCraft > Configure. The weekly summary (Sunday) and, with it, the monthly summary are off; they are turned on under Configure > Notifications. The international consensus ranges and targets are used (Battelino et al., 2019; tight range: Battelino et al., 2023); custom ranges and goals, and separate statistics entities, are optional features that start off and are turned on under Configure > Optional features. {unit_note}",
+                "data": {
+                    "unit": "Display unit",
+                    "notify_enabled": "Daily summary",
+                    "notify_time": "Daily summary time",
+                    "show_dashboard": "Dashboard in the sidebar",
+                    "phone_notify_targets": "Also send notifications to",
+                    "phone_notify_types": "Notifications to send there",
+                    "phone_notify_test": "Send a test notification now"
+                },
+                "data_description": {
+                    "unit": "mg/dL or mmol/L for every glucose value GlucoCraft shows: on its dashboard and display cards, on any wall panels, in the report and in notifications. It starts as the glucose source's own unit.",
+                    "notify_enabled": "The daily summary notification: the last reading, the sensor expiry (where a sensor expiry entity is set), the rolling 24 hours beside the consensus targets, and the time in range of the last 14 days compared with the last 90 days once the sensor has covered at least 70% of both periods. It is created every day at the daily summary time and replaces the previous daily summary; while the sensor has covered less than 70% of the last 24 hours, it states that there are not enough data yet. While custom ranges are in use, each period also states its time in, below and above the custom ranges. This method is a GlucoCraft rule. On by default.",
+                    "notify_time": "The time of the daily summary; the weekly and monthly summaries are created at the same time. Default: 08:00.",
+                    "show_dashboard": "Adds the GlucoCraft dashboard and shows it in Home Assistant's sidebar. Off: the dashboard and all its pages are removed, among them Documentation, CGM Report (with the PDF download), Settings Status and Maintenance; GlucoCraft's cards remain available to other dashboards, and the actions Print report and Export readings as CSV remain available. On by default.",
+                    "phone_notify_targets": "Optional. The phones (with the Home Assistant Companion app) and other notify actions selected here receive the kinds selected under *Notifications to send there*, in addition to Home Assistant's notifications; with nothing selected, the notifications stay in Home Assistant. Sent there, they leave Home Assistant: a phone receives them through the push service of the Companion app, which can deliver them outside the home network; another notify action, through its own service. Each is an ordinary notification, with no priority, sound or channel of its own, and can be delayed or not delivered; a failed delivery is recorded as a warning in the Home Assistant log. What a phone needs (in short, the Home Assistant Companion app, installed and signed in, with notifications permitted for it) is listed, after the setup, on the dashboard page *Settings Status* and in the Documentation, *Notifications (Not Alarms)*.",
+                    "phone_notify_types": "The kinds of GlucoCraft notification that the phones and notify actions selected above receive, each only when selected here: the daily, weekly and monthly summaries, and the no-data notice (independently of its Home Assistant notice). Not selected by default.",
+                    "phone_notify_test": "Sends one test message to each phone and notify action selected above when this screen is submitted, to test the delivery; a failure is recorded in the Home Assistant log, as described above."
+                }
+            }
+        },
+        "error": {
+            "entity_not_found": "The selected primary glucose source does not exist in Home Assistant now. Choose the glucose sensor of the CGM integration; if it is not offered, check that integration under Settings > Devices & services.",
+            "source_is_glucocraft": "A GlucoCraft entity cannot be a glucose source: its value is GlucoCraft's own last reading, not a CGM reading.",
+            "expiry_is_glucocraft": "A GlucoCraft entity cannot be the CGM sensor expiry entity: GlucoCraft's own sensor expiry is taken from the entity chosen here. Choose the entity of the CGM integration that holds the sensor's expiry, or clear the field.",
+            "source_unit_not_glucose": "The selected entity reports its values in a unit other than mg/dL or mmol/L, so GlucoCraft cannot use it as a glucose source. Choose the glucose sensor of the CGM integration.",
+            "secondary_same_as_primary": "The second glucose source cannot be the primary glucose source itself. Choose the entity of another system, or leave the second glucose source empty.",
+            "notify_time_invalid": "The time is not valid. Enter hours and minutes with two digits each, for example 07:05.",
+            "phone_types_empty": "Nothing is chosen to send to the phones selected under *Also send notifications to*. Choose at least one kind of notification under *Notifications to send there*, or clear the phones."
+        },
+        "abort": {
+            "single_instance_allowed": "GlucoCraft is already set up. One GlucoCraft installation in each Home Assistant serves one person and one CGM system; a second system that reads the same CGM sensor can be added as the second source."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "GlucoCraft Settings",
+                "description": "Select the screen to change. Each screen opens on its own; **Submit** there saves that screen only and reloads GlucoCraft, whose entities are unavailable while it reloads. **✕** closes a screen without saving.",
+                "menu_options": {
+                    "sources": "Glucose sources",
+                    "units": "Units and formats",
+                    "features": "Optional features",
+                    "ranges": "Glucose ranges",
+                    "goals": "Custom goals",
+                    "displays": "Display card and wall panels",
+                    "notifications": "Notifications",
+                    "report": "Report and dashboard"
+                }
+            },
+            "sources": {
+                "title": "Glucose Sources",
+                "description": "The glucose sources and the entities that belong to them. GlucoCraft's own entities are not offered and not accepted as sources.\n\nGlucoCraft is designed for readings every 5 minutes or more often. With 15-minute or longer intervals the trend arrow, the 5-minute delta, the no-current-data limit, gaps and Sensor active (data received by GlucoCraft) are not designed to function as described; the readings are still stored and shown. Home Assistant shows a repair notice when a source updates every 15 minutes or less often.\n\n**Sensor lower and upper limit** (per source): The sensor limits must match the CGM sensor's measurement range. GlucoCraft sets them from the source where it can and shows a Repairs notice when the readings point to a different limit; otherwise they are set by hand (Documentation: *Readings Outside the Sensor's Range*). A reading beyond a limit, or one that the CGM system shows as LO or HI, is shown as LO or HI, left out of the values and counted as very low or very high; with a limit set by hand, a reading at the limit as well. A change applies to later readings. This method is a GlucoCraft rule. It is the user's responsibility to know their CGM system and to adjust these settings where necessary.",
+                "data": {
+                    "glucose_entity": "Primary glucose source",
+                    "sensor_expiry_entity": "CGM sensor expiry entity",
+                    "sensor_lower_limit": "Sensor lower limit",
+                    "sensor_upper_limit": "Sensor upper limit",
+                    "primary_time_attribute": "Measurement-time attribute",
+                    "stale_threshold": "No current data after"
+                },
+                "data_description": {
+                    "glucose_entity": "The sensor entity whose state is the glucose value of the CGM system, in mg/dL or mmol/L, with that unit as its unit of measurement. A change keeps the stored readings; the readings of the earlier source remain in the history.",
+                    "sensor_expiry_entity": "Optional. An entity whose state is the CGM sensor's expiry (a date and time, a date or a time stamp) or the time remaining in days, hours or minutes. Without it, the sensor expiry and the expiry-based warm-up detection are not available. After the stated expiry the status shows *Sensor expired* in red; while readings still arrive, the value keeps the color of its zone, with its age, and the trend follows the readings.",
+                    "sensor_lower_limit": "The lowest value the CGM sensor measures. *Automatic*: 40 mg/dL (2.2 mmol/L), or 50 mg/dL (2.8 mmol/L) when the source shows a \"Below 50\" text or is one of the integrations listed in the Documentation section *Readings Outside the Sensor's Range*.",
+                    "sensor_upper_limit": "The highest value the CGM sensor measures. *Automatic*: the limit the source shows (\"Above\" texts or a code number), 400 mg/dL (22.2 mmol/L) for the integrations listed in the Documentation section *Readings Outside the Sensor's Range*, otherwise 500 mg/dL (27.8 mmol/L).",
+                    "primary_time_attribute": "Optional. The attribute of the primary source that holds the time of each measurement, where it is not recognized automatically; blank: detected automatically. A name entered here is the only attribute read. Without a measurement time, the time the reading reaches Home Assistant is used.",
+                    "stale_threshold": "The minutes without a new reading after which GlucoCraft shows *no current data* (5 to 30 minutes; default 15 minutes). The Documentation section *Gaps, Reading Interval and No Current Data* explains the default and what the screens then show."
+                },
+                "sections": {
+                    "second_source": {
+                        "name": "Second glucose source",
+                        "description": "Optional. A second source is designed to supply readings that the primary source misses, up to 24 hours back, and to continue when it stops, merged by measurement time; for example, a second system that reads the same CGM sensor (a different sensor supplies its own values).",
+                        "data": {
+                            "secondary_glucose_entity": "Second glucose source",
+                            "secondary_sensor_lower_limit": "Sensor lower limit",
+                            "secondary_sensor_upper_limit": "Sensor upper limit",
+                            "secondary_time_attribute": "Measurement-time attribute"
+                        },
+                        "data_description": {
+                            "secondary_glucose_entity": "Optional. The sensor entity of the second system, in mg/dL or mmol/L; GlucoCraft's own entities are not accepted.",
+                            "secondary_sensor_lower_limit": "The lowest value the CGM sensor measures. *Automatic*: 40 mg/dL (2.2 mmol/L), or 50 mg/dL (2.8 mmol/L) when the source shows a \"Below 50\" text or is one of the integrations listed in the Documentation section *Readings Outside the Sensor's Range*.",
+                            "secondary_sensor_upper_limit": "The highest value the CGM sensor measures. *Automatic*: the limit the source shows (\"Above\" texts or a code number), 400 mg/dL (22.2 mmol/L) for the integrations listed in the Documentation section *Readings Outside the Sensor's Range*, otherwise 500 mg/dL (27.8 mmol/L).",
+                            "secondary_time_attribute": "Optional. The attribute of the second source that holds the time of each measurement, where it is not recognized automatically; blank: detected automatically. A name entered here is the only attribute read. Without a measurement time, the time the reading reaches Home Assistant is used, and a second source without measurement times is used only after the primary source has been silent for 5 minutes or three of its reading intervals, whichever is longer. This method is a GlucoCraft rule."
+                        }
+                    }
+                }
+            },
+            "units": {
+                "title": "Units and Formats",
+                "description": "How GlucoCraft shows glucose values, glycated hemoglobin (A1C) and the glucose management indicator (GMI), times, dates, weeks and decimals. *Automatic* follows Home Assistant's country; without a country, the conventions of the United States are used (the A1C and GMI unit is described below). The decimal separator follows Home Assistant's language in Canada and Switzerland and when no country is set.",
+                "data": {
+                    "unit": "Display unit",
+                    "a1c_unit": "A1C and GMI unit",
+                    "time_format": "Time format",
+                    "date_format": "Date format",
+                    "first_weekday": "First day of the week",
+                    "decimal_separator": "Decimal separator"
+                },
+                "data_description": {
+                    "unit": "mg/dL or mmol/L for every glucose value GlucoCraft shows: on its dashboard and display cards, on any wall panels, in the report and in notifications; the ranges in the settings are entered in it. A change sets the unit of all GlucoCraft glucose sensors at once; the stored data are not changed.",
+                    "a1c_unit": "The unit of GMI and laboratory A1C on GlucoCraft's dashboard and display cards, on any wall panels, in the CGM Report and in notifications. Automatic: mmol/mol, both units or percent, by the units that the laboratories of Home Assistant's country report; without a country, both units with the display unit mmol/L and percent with mg/dL. This method is a GlucoCraft rule. The GMI entities and the gmi attributes stay in percent; the period sensors hold the value in mmol/mol as the attribute gmi_mmol_mol beside them. The conversions and their sources (Bergenstal et al., 2018; Hoelzel et al., 2004): Documentation, *Setup*.",
+                    "time_format": "The clock and the times on GlucoCraft's dashboard and display cards, on any wall panels, in the report and in notifications.",
+                    "date_format": "The order of day, month and year in the same places; weekday and month names come from GlucoCraft's language catalogue, which is provided in English only.",
+                    "first_weekday": "The first day of the calendars and the week rows of the CGM Report page and its PDF; rolling 7-day periods are not affected.",
+                    "decimal_separator": "Every displayed decimal on GlucoCraft's dashboard and display cards, on any wall panels, in the report and PDF and in notifications. Stored data, attributes and the application programming interface always use the point. The descriptive texts on the dashboard pages show the new separator after the dashboard page is reloaded; every number on the cards and panels changes at once."
+                }
+            },
+            "features": {
+                "title": "Optional Features",
+                "description": "Two optional features, each off in a new installation. Turning a feature off removes its entities and keeps the stored settings; turning it on again creates the same entities under GlucoCraft's own entity IDs, and the recorded history of those entity IDs continues. Changes made to these entities in Home Assistant (entity ID, name, area, labels, hidden or disabled) are not kept when the feature is turned off. Home Assistant keeps their recorded states for its recorder period and their long-term statistics. After Custom ranges and goals is turned on, the screens Glucose ranges and Custom goals appear in the Configure menu the next time it is opened.",
+                "data": {
+                    "custom_ranges_and_goals": "Custom ranges and goals",
+                    "separate_statistics": "Separate statistics entities"
+                },
+                "data_description": {
+                    "custom_ranges_and_goals": "On: the ranges and goals in the settings replace the consensus ranges for the zone of the glucose value on the display cards and wall panels, the range bands of their graphs and, where selected, the weekly pages, and for the range binary sensors, the zone attribute of the Last glucose reading sensor and the zone in the Spoken summary (these entities change with it); this adds the *Custom Ranges* page, the CGM Report's appendix *Custom Ranges and Goals*, the *Glucose ranges* and *Custom goals* screens and 49 entities. Off (the default): the international consensus ranges and targets are used everywhere (Battelino et al., 2019; tight range: Battelino et al., 2023), and the stored ranges and goals are kept. Documentation: *Setup*.",
+                    "separate_statistics": "On: one entity per statistic and period for the mean, standard deviation, coefficient of variation (CV), lowest reading, highest reading, number of readings and Sensor active (data received by GlucoCraft) of every period, and for the glucose management indicator (GMI) and the Glycemia Risk Index (GRI) of the periods of 14 days and longer (57 entities). Home Assistant's recorder stores the state of each of these entities when it changes (the statistics are calculated every 5 minutes) and their long-term statistics. Off (the default): these entities are removed; GlucoCraft's dashboard, display card and wall panels do not use them, and the same values remain available as attributes of each period's consensus ranges sensor."
+                }
+            },
+            "ranges": {
+                "title": "Glucose Ranges",
+                "description": "The defaults are the international consensus ranges and targets (Battelino et al., 2019). Ranges and goals that differ from them are custom settings.\n\n{source_note}Values are entered in the display unit (mg/dL or mmol/L; GlucoCraft stores them in mg/dL). The very-low limit cannot be lower than the glucose sensor's lower limit ({lower_limit}) and the very-high limit not higher than its upper limit ({upper_limit}), so that a LO reading is always very low and a HI reading always very high. A value out of ascending order is marked at its field. Documentation: *Setup*.",
+                "data": {
+                    "range_critical_low": "Very low: below",
+                    "range_low": "Low: below",
+                    "range_tight_low": "Tight range: from",
+                    "range_tight_high": "Tight range: to",
+                    "range_high": "High: above",
+                    "range_critical_high": "Very high: above"
+                },
+                "data_description": {
+                    "range_critical_low": "The very-low limit. Consensus value: 54 mg/dL = 3.0 mmol/L (Battelino et al., 2019). Allowed: from the glucose sensor's lower limit (40 mg/dL for most CGM systems, 50 mg/dL for those whose readings stop at 50; with a second source, the higher of the two) to 70 mg/dL (2.2 or 2.8 to 3.9 mmol/L), so that a LO reading is always very low; see Readings Outside the Sensor's Range in the Documentation.",
+                    "range_low": "The low limit. Consensus value: 70 mg/dL = 3.9 mmol/L (Battelino et al., 2019). Allowed: 50 to 100 mg/dL (2.8 to 5.6 mmol/L).",
+                    "range_tight_low": "The start of the tight range. Consensus value: 70 mg/dL = 3.9 mmol/L (Battelino et al., 2023). Allowed: 50 to 100 mg/dL (2.8 to 5.6 mmol/L).",
+                    "range_tight_high": "The end of the tight range. Consensus value: 140 mg/dL = 7.8 mmol/L (Battelino et al., 2023). Allowed: 100 to 200 mg/dL (5.6 to 11.1 mmol/L).",
+                    "range_high": "The high limit. Consensus value: 180 mg/dL = 10.0 mmol/L (Battelino et al., 2019). Allowed: 120 to 300 mg/dL (6.7 to 16.7 mmol/L).",
+                    "range_critical_high": "The very-high limit. Consensus value: 250 mg/dL = 13.9 mmol/L (Battelino et al., 2019). Allowed: 180 to 400 mg/dL (10.0 to 22.2 mmol/L), and not higher than the glucose sensor's upper limit (with a second source, the lower of the two), so that a HI reading is always very high; see Readings Outside the Sensor's Range in the Documentation."
+                }
+            },
+            "goals": {
+                "title": "Custom Goals",
+                "description": "The defaults are the international consensus ranges and targets (Battelino et al., 2019). Ranges and goals that differ from them are custom settings.\n\nThese goals are compared with the statistics of 14 days and longer on *Custom Ranges* and, where selected, on the weekly pages of the display card and wall panels. Each goal is in percent; the description under each field gives the consensus target, where one exists.",
+                "data": {
+                    "goal_time_in_target_range": "Time in range: more than",
+                    "goal_time_in_ideal_range": "Time in tight range: at least",
+                    "goal_tbr": "Time below the low limit: less than",
+                    "goal_tbr_critical": "Time below the very-low limit: less than",
+                    "goal_tar": "Time above the high limit: less than",
+                    "goal_tar_critical": "Time above the very-high limit: less than",
+                    "goal_cv": "Coefficient of variation (CV): at most",
+                    "goal_gmi": "GMI: less than"
+                },
+                "data_description": {
+                    "goal_time_in_target_range": "The goal for the time in range. Consensus target: more than 70% (Battelino et al., 2019). Allowed: 50% to 99%.",
+                    "goal_time_in_ideal_range": "The goal for the time in tight range. No consensus target exists; no goal is set by default, and an empty box means no goal. Allowed: 20% to 100%.",
+                    "goal_tbr": "The goal for the time below the low limit. Consensus target: less than 4% (Battelino et al., 2019). Allowed: 1% to 20%.",
+                    "goal_tbr_critical": "The goal for the time below the very-low limit. Consensus target: less than 1% (Battelino et al., 2019). This goal cannot be higher than the goal for the time below the low limit, because that time includes the time below the very-low limit. Allowed: 1% to 10%.",
+                    "goal_tar": "The goal for the time above the high limit. Consensus target: less than 25% (Battelino et al., 2019). Allowed: 5% to 50%.",
+                    "goal_tar_critical": "The goal for the time above the very-high limit. Consensus target: less than 5% (Battelino et al., 2019). This goal cannot be higher than the goal for the time above the high limit, because that time includes the time above the very-high limit. Allowed: 1% to 20%.",
+                    "goal_cv": "The goal for the coefficient of variation. Consensus target: 36% or less (Battelino et al., 2019; Monnier et al., 2017). Allowed: 15% to 50%.",
+                    "goal_gmi": "The goal for the glucose management indicator (GMI). No consensus target exists; no goal is set by default, and an empty box means no goal. The goal is entered in percent; where the A1C and GMI unit includes mmol/mol, it is shown converted with the GMI equation, as the GMI values are: the GMI in mmol/mol of the mean glucose whose GMI in percent is the goal (Bergenstal et al., 2018). Allowed: 4.0% to 12.0% (20 to 108 mmol/mol)."
+                }
+            },
+            "displays": {
+                "title": "Display Card and Wall Panels",
+                "description": "The display card on the dashboard and any wall panels. The display colors are used for the glucose value and for everything else that shows a zone by color; the graph range colors only for the range bands of the graphs. Color is never the only cue: the zone word under the glucose value names the zone in every setting. On a chosen background the text is black or white, whichever contrasts more, and the graphs keep their black area. The CGM Report keeps the colors of the published report examples.\n\n**Contrast of the saved colors:** {contrast_note} The note changes no color; the chosen colors are always used. The minimums are those of the Web Content Accessibility Guidelines (WCAG) 2.2: 4.5:1 for text and 3:1 for large text such as the glucose value (World Wide Web Consortium, 2024). The default graph range colors are those of the CGM Report's glucose profile. The setting *Outline text* draws an edge around the graph labels and the text in a zone color.\n\n**Wall-panel address:** {panel_address}",
+                "data": {
+                    "display_card": "Display card layout",
+                    "trend_display": "Trend shown as",
+                    "color_very_low": "Very low",
+                    "color_low": "Low",
+                    "color_near_low": "In range, below the tight range",
+                    "color_tight_range": "Tight range",
+                    "color_near_high": "In range, above the tight range",
+                    "color_high": "High",
+                    "color_very_high": "Very high",
+                    "colors_reset": "Restore the default palette",
+                    "card_background": "Display card background",
+                    "card_background_color": "Display card background color",
+                    "panel_background": "Wall panel background color",
+                    "text_outline": "Outline text",
+                    "flash_no_current_data": "Fade the words when there is no current reading",
+                    "weekly_pages": "Range set of the weekly pages",
+                    "regenerate_panel_webhook": "Create a new wall-panel address"
+                },
+                "data_description": {
+                    "display_card": "The layout of the display card on the Start page (titled GlucoCraft) of GlucoCraft's dashboard, while *Dashboard in the sidebar* is on; a display card added to another dashboard has the layout of its own card type. It does not have to match any wall panel: a card that does not match a panel shows the same information in a different layout. Default: Square.",
+                    "trend_display": "How every display (the display cards and any wall panels) shows the trend in its TREND column: as the arrow, turned by the rate of change, or as the trend word, the broader category of the same rate (for example *Changing slowly*; a longer word on two lines). The trend is not shown while there is no current data, during a sensor warm-up or while the trend is unknown. The zone word is shown under the glucose value with either choice. The small value in the corner of the square wall panel's weekly pages shows the trend as the arrow with either choice. Default: Arrow.",
+                    "color_very_low": "The color of glucose values below the very-low limit. Default: dark red.",
+                    "color_low": "The color of low glucose values (below the low limit, not below the very-low limit). Default: red.",
+                    "color_near_low": "The color of in-range glucose values below the tight range. Default: amber.",
+                    "color_tight_range": "The color of glucose values in the tight range. Default: green.",
+                    "color_near_high": "The color of in-range glucose values above the tight range. Default: amber.",
+                    "color_high": "The color of high glucose values (above the high limit, not above the very-high limit). Default: blue.",
+                    "color_very_high": "The color of glucose values above the very-high limit. Default: dark blue.",
+                    "colors_reset": "Returns every zone to the default palette, which shows lows in red, highs in blue and the in-range zones in amber and green; the colors chosen above are not kept.",
+                    "card_background": "What is behind the display card on the dashboard. *Home Assistant theme*: the card takes the same background as the other cards on the dashboard, which follows the Home Assistant theme in use (for example light mode, dark mode or an installed theme), and its text uses the theme's text color. *The color below*: the card always has the color chosen below, whatever the theme, and its text is black or white, whichever has the higher contrast with that color. The graphs keep their black area either way. Default: the color below, black, as on the wall panels.",
+                    "card_background_color": "Used only when *The color below* is chosen above. Default: black.",
+                    "panel_background": "The background of every wall panel. Wall panels have no Home Assistant theme, so a color is chosen here. The text changes to black or white, whichever has the higher contrast with it, and the graphs keep their black area. Default: black.",
+                    "text_outline": "Draws a thin edge, dark around light text and light around dark text, around text on the display card and every wall panel: the graph labels, the glucose value, LO and HI, and every word drawn in a zone color. The edge adds contrast where such text sits on a similar color, for example light text on a light background or on a pale graph band. Off by default: text is drawn plain.",
+                    "flash_no_current_data": "While there is no current reading, the display card and every wall panel show *Sensor warming up*, *Sensor expired* or *No current data* in place of the value. With this setting on, the words fade smoothly from full brightness to about 30% and back, once every 3 seconds, for the first 30 minutes of each episode, then stay still; the status bar's *Sensor expiry passed* fades the same way until a new sensor is recognized. The words never disappear, and their text does not change. Off: both stay still. The display cards also keep both still while the device's reduced-motion setting is on. On by default.",
+                    "weekly_pages": "The nine weekly pages of the display card and of every wall panel show the 14-day values at the end of each of the last 26 weeks. They use one of two range sets: the consensus ranges or the custom ranges; the target line of each page follows the chosen set and is labeled *Consensus target* or *Custom goal*, for the display card and every wall panel at the same time, while the dashboard always shows both range sets. This choice is offered only while the optional feature Custom ranges and goals is on and custom ranges or goals are set; otherwise the weekly pages use the consensus ranges.",
+                    "regenerate_panel_webhook": "Creates the address from which wall panels read their data; no address exists after setup. Create the first address before the first wall panel is built: the build needs its id. After that, create a new address only if the address may have been exposed, for example in a shared log, backup or screenshot. The moment a new address is created, the earlier one stops working, and every wall panel receives no data until it is built and installed again with the new id (shown at the top of this screen when it is opened again). The steps: Documentation, *Setup*, and the wall panel guide."
+                },
+                "sections": {
+                    "graph_colors": {
+                        "name": "Graph range colors",
+                        "description": "The colors of the range bands in the graphs of the display cards, any wall panels and the dashboard, each drawn at 60% over the graph's black area. By default they are the colors of the CGM Report's glucose profile; the glucose value and everything else in a zone color keep the display colors above.",
+                        "data": {
+                            "band_color_very_low": "Very low",
+                            "band_color_low": "Low",
+                            "band_color_near_low": "In range, below the tight range",
+                            "band_color_tight_range": "Tight range",
+                            "band_color_near_high": "In range, above the tight range",
+                            "band_color_high": "High",
+                            "band_color_very_high": "Very high",
+                            "band_colors_reset": "Restore the default graph colors"
+                        },
+                        "data_description": {
+                            "band_color_very_low": "The band below the very-low limit. Default: dark red.",
+                            "band_color_low": "The band below the low limit, down to the very-low limit. Default: red.",
+                            "band_color_near_low": "The band in range below the tight range. Default: green.",
+                            "band_color_tight_range": "The band of the tight range. Default: light green.",
+                            "band_color_near_high": "The band in range above the tight range. Default: green.",
+                            "band_color_high": "The band above the high limit, up to the very-high limit. Default: yellow.",
+                            "band_color_very_high": "The band above the very-high limit. Default: orange.",
+                            "band_colors_reset": "Returns every graph band to the default colors, those of the CGM Report's glucose profile; the graph colors chosen above are not kept."
+                        }
+                    }
+                }
+            },
+            "notifications": {
+                "title": "Notifications",
+                "description": "The summaries, the no-data notice and the phones that receive GlucoCraft's notifications.",
+                "data": {
+                    "notify_enabled": "Daily summary",
+                    "notify_time": "Daily summary time",
+                    "notify_weekly_enabled": "Weekly summary",
+                    "notify_weekly_day": "Weekly summary day",
+                    "no_data_notice": "No-data notice",
+                    "no_data_notice_delay": "Notify after",
+                    "phone_notify_targets": "Also send notifications to",
+                    "phone_notify_types": "Notifications to send there",
+                    "phone_notify_test": "Send a test notification now"
+                },
+                "data_description": {
+                    "notify_enabled": "The daily summary notification: the last reading, the sensor expiry (where a sensor expiry entity is set), the rolling 24 hours beside the consensus targets, and the time in range of the last 14 days compared with the last 90 days once the sensor has covered at least 70% of both periods. It is created every day at the daily summary time and replaces the previous daily summary; while the sensor has covered less than 70% of the last 24 hours, it states that there are not enough data yet. While custom ranges are in use, each period also states its time in, below and above the custom ranges. This method is a GlucoCraft rule. On by default.",
+                    "notify_time": "The time of the daily summary; the weekly and monthly summaries are created at the same time. Default: 08:00.",
+                    "notify_weekly_enabled": "The weekly summary notification: the rolling 7 and 14 days beside the consensus targets, and the time in range of the last 14 days compared with the last 90 days when the difference is 5 percentage points or more. It is created on the weekly summary day at the daily summary time and replaces the previous weekly summary. In calendar weeks 4, 8, 12 and so on (ISO week numbers) the monthly summary (rolling 30 and 90 days and 6 months), with the time in range of the last 30 days compared with the last 90 days and with the last 6 months when the difference is 5 percentage points or more, is created with it and replaces the previous monthly summary; turning the weekly summary off also stops the monthly summary. Each period of a summary is shown only when the sensor has covered at least 70% of the period; otherwise the summary states that there are not enough data yet, and a comparison is listed only when both of its periods have that much data. While custom ranges are in use, each period also states its time in, below and above the custom ranges. This method is a GlucoCraft rule. Off by default.",
+                    "notify_weekly_day": "The day of the weekly summary. Default: Sunday.",
+                    "no_data_notice": "A Home Assistant notification when GlucoCraft has received no readings for the time set under *Notify after*: \"GlucoCraft has received no readings since 1:02 AM.\" It is a notice about GlucoCraft's data, never about glucose: one notice for each interruption, created no earlier than *no current data*, and removed when a reading arrives; it is not repeated, and no message follows when the readings return. During a sensor warm-up it is created only from 3 hours after the warm-up began, with its own text; a warm-up ends by itself after 24 hours. This method is a GlucoCraft rule. The phones receive it only where *No-data notice* is selected under *Notifications to send there*, independently of this switch. Off by default.",
+                    "no_data_notice_delay": "The time since the last reading after which the no-data notice is created: 15, 30, 60 or 120 minutes, never before *no current data* is shown (the screen *Glucose sources*, *No current data after*), so that a short interruption of the delivery does not create it. Default: 30 minutes.",
+                    "phone_notify_targets": "Optional. The phones (with the Home Assistant Companion app) and other notify actions selected here receive the kinds selected under *Notifications to send there*, in addition to Home Assistant's notifications; with nothing selected, the notifications stay in Home Assistant. Sent there, they leave Home Assistant: a phone receives them through the push service of the Companion app, which can deliver them outside the home network; another notify action, through its own service. Each is an ordinary notification, with no priority, sound or channel of its own, and can be delayed or not delivered; a failed delivery is recorded as a warning in the Home Assistant log. What a phone needs: *Settings Status*; Documentation: *Notifications (Not Alarms)*.",
+                    "phone_notify_types": "The kinds of GlucoCraft notification that the phones and notify actions selected above receive, each only when selected here: the daily, weekly and monthly summaries, and the no-data notice (independently of its Home Assistant notice). Not selected by default.",
+                    "phone_notify_test": "Sends one test message to each phone and notify action selected above when this screen is submitted, to test the delivery; a failure is recorded in the Home Assistant log, as described above."
+                }
+            },
+            "report": {
+                "title": "Report and Dashboard",
+                "description": "The PDF of the CGM Report (CGM: continuous glucose monitoring), its printing, the GlucoCraft dashboard in the sidebar, and what deleting GlucoCraft keeps. The report prints the names of the glucose sources. To keep a personal name off the report, rename the source in Home Assistant.",
+                "data": {
+                    "paper_size": "PDF paper size",
+                    "printer_address": "Report printer",
+                    "show_dashboard": "Dashboard in the sidebar",
+                    "on_removal": "When GlucoCraft is deleted"
+                },
+                "data_description": {
+                    "paper_size": "The paper size of the CGM Report PDF. Automatic: Letter or A4, from Home Assistant's country (Letter when no country is set).",
+                    "printer_address": "Optional. The Internet Printing Protocol (IPP) address of a network printer that accepts PDF files, for example ipp://192.0.2.10, without a user name or password; without a port, 631 is used, and without a path, /ipp/print. ipps://, http:// and https:// are also accepted; an address without one of these is read as ipp://. ipps:// and https:// work only with a printer certificate that Home Assistant trusts; most printers' own certificates are not trusted, and the print then fails. A report that is printed leaves Home Assistant for this address, which can be any address, inside or outside the home network; without an address, no report is sent anywhere. The report can be downloaded as a PDF on the *CGM Report* page while *Dashboard in the sidebar* (below) is on.",
+                    "show_dashboard": "Adds the GlucoCraft dashboard and shows it in Home Assistant's sidebar. Off: the dashboard and all its pages are removed, among them Documentation, CGM Report (with the PDF download), Settings Status and Maintenance; GlucoCraft's cards remain available to other dashboards, and the actions Print report and Export readings as CSV remain available. On by default.",
+                    "on_removal": "Keep the readings for a reinstall (the default): deleting GlucoCraft keeps its stored readings, the laboratory A1C results and the sensor changes in the glucocraft folder of the Home Assistant configuration, and removes everything else; a new installation offers to use them again or to delete them. The settings are not kept: a reinstall starts with the default settings. Delete everything: deleting GlucoCraft removes everything it stored, the readings included. Home Assistant's Delete has no options, so the choice is made here, beforehand. Reload restarts GlucoCraft without deleting anything; Disable turns it off. See the Documentation, section *Installing, Updating and Removing GlucoCraft*."
+                }
+            }
+        },
+        "error": {
+            "range_order": "The range limits are not in ascending order. They must be in ascending order: very low less than low, low at most tight range from, tight range from less than tight range to, tight range to at most high, and high less than very high.",
+            "range_critical_low_order": "The very-low limit must be lower than the low limit.",
+            "range_low_order": "The low limit must be higher than the very-low limit and not higher than the start of the tight range.",
+            "range_tight_low_order": "The start of the tight range must not be lower than the low limit and must be lower than the end of the tight range.",
+            "range_tight_high_order": "The end of the tight range must be higher than its start and not higher than the high limit.",
+            "range_high_order": "The high limit must not be lower than the end of the tight range and must be lower than the very-high limit.",
+            "range_critical_high_order": "The very-high limit must be higher than the high limit.",
+            "range_critical_low_below_sensor_limit": "The very-low limit cannot be lower than the glucose sensor's lower limit, {lower_limit}: a LO reading lies below that limit and is always very low.",
+            "range_critical_high_above_sensor_limit": "The very-high limit cannot be higher than the glucose sensor's upper limit, {upper_limit}: a HI reading lies above that limit and is always very high.",
+            "goal_tbr_critical_order": "The goal for the time below the very-low limit cannot be higher than the goal for the time below the low limit, because the time below the low limit includes the time below the very-low limit.",
+            "goal_tar_critical_order": "The goal for the time above the very-high limit cannot be higher than the goal for the time above the high limit, because the time above the high limit includes the time above the very-high limit.",
+            "source_is_glucocraft": "A GlucoCraft entity cannot be a glucose source: its value is GlucoCraft's own last reading, not a CGM reading.",
+            "expiry_is_glucocraft": "A GlucoCraft entity cannot be the CGM sensor expiry entity: GlucoCraft's own sensor expiry is taken from the entity chosen here. Choose the entity of the CGM integration that holds the sensor's expiry, or clear the field.",
+            "source_unit_not_glucose": "The selected entity reports its values in a unit other than mg/dL or mmol/L, so GlucoCraft cannot use it as a glucose source. Choose the glucose sensor of the CGM integration.",
+            "secondary_same_as_primary": "The second glucose source cannot be the primary glucose source itself. Choose the entity of another system, or leave the second glucose source empty.",
+            "entity_not_found": "The selected primary glucose source does not exist in Home Assistant now. Choose the glucose sensor of the CGM integration; if it is not offered, check that integration under Settings > Devices & services.",
+            "printer_invalid": "The printer address is not valid. It is a host name or IP address, optionally with ipp://, ipps://, http:// or https://, a port and a path, and without a user name or password.",
+            "notify_time_invalid": "The time is not valid. Enter hours and minutes with two digits each, for example 07:05.",
+            "phone_types_empty": "Nothing is chosen to send to the phones selected under *Also send notifications to*. Choose at least one kind of notification under *Notifications to send there*, or clear the phones."
+        }
+    },
+    "services": {
+        "send_daily_summary": {
+            "name": "Send daily summary",
+            "description": "Creates the GlucoCraft daily summary notification immediately (the last reading, the rolling 24 hours, and the time in range of the last 14 days compared with the last 90 days once both periods have enough data), also while the scheduled daily summary is off. It replaces the previous daily summary and is also sent to any phones or notify actions chosen to receive the summaries (Configure > Notifications). For administrators only; automations and scripts can also call it."
+        },
+        "send_weekly_summary": {
+            "name": "Send weekly summary",
+            "description": "Creates the GlucoCraft weekly summary notification immediately (rolling 7 and 14 days, and the time in range of the last 14 days compared with the last 90 days when both periods have enough data and the difference is 5 percentage points or more), also while the scheduled weekly summary is off. It replaces the previous weekly summary and is also sent to any phones or notify actions chosen to receive the summaries (Configure > Notifications). For administrators only; automations and scripts can also call it."
+        },
+        "send_monthly_summary": {
+            "name": "Send monthly summary",
+            "description": "Creates the GlucoCraft monthly summary notification immediately (rolling 30 and 90 days and 6 months), with the time in range of the last 30 days compared with the last 90 days and with the last 6 months when both periods compared have enough data and the difference is 5 percentage points or more, also while the scheduled weekly summary, which brings the monthly summary, is off. It replaces the previous monthly summary and is also sent to any phones or notify actions chosen to receive the summaries (Configure > Notifications). For administrators only; automations and scripts can also call it."
+        },
+        "add_lab_a1c": {
+            "name": "Add laboratory A1C",
+            "description": "Stores a laboratory A1C (glycated hemoglobin) result for the CGM Report, which compares it with the glucose management indicator (GMI) of the 90 days ending on its date. The GMI is shown beside it only with at least 70% sensor active in those 90 days (the condition of Battelino et al., 2019); a result whose 90 days begin before the 200 days of readings that GlucoCraft keeps has no CGM comparison. This method is a GlucoCraft rule. A result with the same date is replaced. For administrators only; automations and scripts can also call it.",
+            "fields": {
+                "date": {
+                    "name": "Date",
+                    "description": "Date of the blood test."
+                },
+                "a1c": {
+                    "name": "A1C",
+                    "description": "Laboratory A1C in the unit chosen below: percent from 3 to 20, kept with one decimal, or mmol/mol from 9 to 195, kept in whole numbers."
+                },
+                "unit": {
+                    "name": "Unit",
+                    "description": "Unit of the A1C entered: percent (NGSP, National Glycohemoglobin Standardization Program units), or mmol/mol (IFCC, International Federation of Clinical Chemistry and Laboratory Medicine units). A result in mmol/mol is kept in whole mmol/mol and converted to percent with the IFCC–NGSP master equation (Hoelzel et al., 2004). Default: percent."
+                }
+            }
+        },
+        "remove_lab_a1c": {
+            "name": "Remove laboratory A1C",
+            "description": "Removes the laboratory A1C result of the given date. When no result exists for that date, nothing is changed. For administrators only; automations and scripts can also call it.",
+            "fields": {
+                "date": {
+                    "name": "Date",
+                    "description": "Date of the blood test to remove."
+                }
+            }
+        },
+        "print_report": {
+            "name": "Print report",
+            "description": "Creates the GlucoCraft CGM Report as a PDF and sends it to the printer set in GlucoCraft's settings (Configure > Report and dashboard > Report printer); CGM stands for continuous glucose monitoring. Each PDF, printed or downloaded on the CGM Report page, is also kept in the glucocraft_reports folder of the Home Assistant configuration; the last 12 are kept, and removing GlucoCraft deletes every report PDF in this folder (files of other names are kept). Without a printer address, no PDF is created and the action fails. After each attempt the notification GlucoCraft CGM Report states the result; the action returns it as its response when the report was sent, and fails with the reason otherwise. The two appendices are included only when chosen. For administrators only; automations and scripts can also call it.",
+            "fields": {
+                "days": {
+                    "name": "Period",
+                    "description": "Number of days, ending at the last midnight. Default: 14 days."
+                },
+                "report": {
+                    "name": "Report",
+                    "description": "Summary: the 14-day section (time in ranges, glucose metrics, the glucose profile and the daily glucose profiles), the longer-term overview (30 days and longer), the weekly trend (90 days and 6 months), Hypoglycemia, Hyperglycemia, the comparison with the previous period (not in the 6-month report), Data Quality and Laboratory A1C. Full report: also Hypoglycemia Events by Period, the daily glucose profiles of the whole period (30 days and longer), Daily Patterns, the Daily Summary, the Daily Log and the Monthly Summary (every calendar month of the period). Default: Summary."
+                },
+                "color": {
+                    "name": "Color",
+                    "description": "Color (on) or grayscale (off). On by default."
+                },
+                "two_sided": {
+                    "name": "Two-sided",
+                    "description": "Two-sided printing where the printer supports it. On by default."
+                },
+                "include_custom_appendix": {
+                    "name": "Include the custom ranges and goals appendix",
+                    "description": "The appendix *Custom Ranges and Goals* shows the statistics calculated with the ranges and goals in the settings, labeled as the user's own settings; the main report always uses the consensus ranges. Available only while the optional feature Custom ranges and goals is on. Off by default."
+                },
+                "include_research_appendix": {
+                    "name": "Include the research measures appendix",
+                    "description": "The appendix *Measures Defined for Research* shows measures that research publications define but the clinical-care standards do not; no targets. Off by default."
+                }
+            }
+        },
+        "export_csv": {
+            "name": "Export readings as CSV",
+            "description": "Saves every stored reading (the local time and the Coordinated Universal Time (UTC), the value in mg/dL and in the display unit, the source, and the LO / HI flag of a reading outside the sensor's measurement range) and the laboratory A1C results as CSV (comma-separated values) files in the glucocraft_exports folder of the Home Assistant configuration. The last 12 exports are kept; older export files are deleted. Removing GlucoCraft deletes every CSV export in this folder (files of other names are kept); to keep an export, copy it elsewhere. The action Import readings from CSV reads an export back in, also after a reinstall. The folder is not accessible from the web; it is reached through access to the Home Assistant configuration folder. A notification confirms the export. For administrators only; automations and scripts can also call it."
+        },
+        "import_csv": {
+            "name": "Import readings from CSV",
+            "description": "Reads one of GlucoCraft's own CSV exports back in: its readings (in either display unit, also when a spreadsheet program saved it again with the decimal comma) and the laboratory A1C results of the export with the same time stamp. Readings already stored win: a reading within 30 seconds of a stored reading is not imported, and a stored reading is never changed or doubled; a laboratory result of a date already stored is kept as it is. Only readings within the 200 days that GlucoCraft keeps are imported. A notification states how many readings were imported; the action also returns the counts as its response. For administrators only; automations and scripts can also call it.",
+            "fields": {
+                "file": {
+                    "name": "File",
+                    "description": "The name of the readings export (a name that begins with glucocraft-readings_, followed by its date and time, and ends with .csv) in the glucocraft_exports folder of the Home Assistant configuration, without a folder. A file copied in from elsewhere is put into that folder first. Empty: the newest export there."
+                }
+            }
+        }
+    },
+    "selector": {
+        "time_format": {
+            "options": {
+                "auto": "Automatic (from Home Assistant's country)",
+                "12": "12-hour (7:46 AM)",
+                "24": "24-hour (07:46)"
+            }
+        },
+        "date_format": {
+            "options": {
+                "auto": "Automatic (from Home Assistant's country)",
+                "mdy": "Month-day-year (10/22/2026)",
+                "dmy": "Day-month-year (22/10/2026)",
+                "ymd": "Year-month-day (2026-10-22)"
+            }
+        },
+        "display_card": {
+            "options": {
+                "square": "Square (480 × 480), the layout of the square 480 × 480 example panel",
+                "rectangular": "Rectangular (800 × 480), the layout of the 800 × 480 example panel; close to the 1024 × 600 and 480 × 320 example panels"
+            }
+        },
+        "card_background": {
+            "options": {
+                "theme": "Home Assistant theme (matches the other dashboard cards)",
+                "color": "The color below (the same on every theme)"
+            }
+        },
+        "weekly_pages": {
+            "options": {
+                "consensus": "Consensus ranges and targets",
+                "personal": "Custom ranges and goals"
+            }
+        },
+        "notify_weekly_day": {
+            "options": {
+                "0": "Monday",
+                "1": "Tuesday",
+                "2": "Wednesday",
+                "3": "Thursday",
+                "4": "Friday",
+                "5": "Saturday",
+                "6": "Sunday"
+            }
+        },
+        "first_weekday": {
+            "options": {
+                "auto": "Automatic (from Home Assistant's country)",
+                "monday": "Monday",
+                "sunday": "Sunday",
+                "saturday": "Saturday"
+            }
+        },
+        "decimal_separator": {
+            "options": {
+                "auto": "Automatic (from Home Assistant's country and language)",
+                "point": "Point (5.6)",
+                "comma": "Comma (5,6)"
+            }
+        },
+        "a1c_unit": {
+            "options": {
+                "auto": "Automatic (from Home Assistant's country; GlucoCraft rule)",
+                "percent": "Percent (7.0%)",
+                "mmol_mol": "mmol/mol (53 mmol/mol)",
+                "both": "Both, for example 7.0% (53 mmol/mol)"
+            }
+        },
+        "paper_size": {
+            "options": {
+                "auto": "Automatic (Letter in the United States and its territories, Canada, Mexico, the Philippines and the Letter countries of Latin America, and when no country is set; A4 elsewhere)",
+                "letter": "Letter (8.5 × 11 in)",
+                "a4": "A4 (210 × 297 mm)"
+            }
+        },
+        "sensor_lower_limit": {
+            "options": {
+                "auto": "Automatic (40 mg/dL, or 50 mg/dL when the source shows it or is listed in the Documentation)",
+                "40": "40 mg/dL (2.2 mmol/L)",
+                "50": "50 mg/dL (2.8 mmol/L)"
+            }
+        },
+        "sensor_upper_limit": {
+            "options": {
+                "auto": "Automatic (the limit the source shows; 400 mg/dL for the sources listed in the Documentation; otherwise 500 mg/dL; only a reading above the limit is HI)",
+                "400": "400 mg/dL (22.2 mmol/L)",
+                "450": "450 mg/dL (25.0 mmol/L)",
+                "500": "500 mg/dL (27.8 mmol/L)"
+            }
+        },
+        "report_days": {
+            "options": {
+                "14": "14 days",
+                "30": "30 days",
+                "90": "90 days",
+                "180": "6 months (180 days)"
+            }
+        },
+        "report_kind": {
+            "options": {
+                "summary": "Summary",
+                "full": "Full report"
+            }
+        },
+        "lab_a1c_unit": {
+            "options": {
+                "percent": "Percent (%)",
+                "mmol_mol": "mmol/mol (IFCC: International Federation of Clinical Chemistry and Laboratory Medicine)"
+            }
+        },
+        "trend_display": {
+            "options": {
+                "arrow": "Arrow (default): one arrow, turned by the rate of change",
+                "word": "Word: the trend category (for example Changing slowly), the broader category of the same rate"
+            }
+        },
+        "phone_notify_types": {
+            "options": {
+                "summaries": "Daily, weekly and monthly summaries",
+                "no_data_notice": "No-data notice"
+            }
+        },
+        "no_data_notice_delay": {
+            "options": {
+                "15": "15 minutes",
+                "30": "30 minutes",
+                "60": "60 minutes",
+                "120": "120 minutes"
+            }
+        },
+        "on_removal": {
+            "options": {
+                "keep": "Keep the readings for a reinstall",
+                "delete": "Delete everything"
+            }
+        },
+        "kept_readings": {
+            "options": {
+                "keep": "Keep them",
+                "delete": "Delete them and start fresh"
+            }
+        }
+    },
+    "issues": {
+        "source_unit_unknown": {
+            "title": "Glucose source without a unit",
+            "description": "The glucose source {entity} reports no unit of measurement, and its values look like mmol/L. GlucoCraft treats values without a unit as mg/dL and does not use values below 30 from such a source, so these readings are not used. Give the entity the unit mmol/L (for example with a template sensor or the entity's settings) or choose a source that reports its unit. This notice closes by itself when the source reports a unit or a value of 30 or more."
+        },
+        "source_unit_not_glucose": {
+            "title": "Glucose source with a unit other than mg/dL or mmol/L",
+            "description": "The glucose source {entity} reports its values in {unit}, not in mg/dL or mmol/L, so GlucoCraft does not use them as glucose readings. Choose the glucose sensor of the CGM integration as the source in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when the source reports mg/dL or mmol/L, or when another source is chosen."
+        },
+        "source_missing": {
+            "title": "Glucose source not found",
+            "description": "The glucose source {entity} does not exist in Home Assistant. This happens when the CGM integration was removed or set up again, or when the entity received a new entity id while GlucoCraft was not running; while GlucoCraft runs, it follows a new entity id. GlucoCraft receives no readings from this source. Choose the current glucose sensor of the CGM integration in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when the entity exists again or another source is chosen."
+        },
+        "slow_source": {
+            "title": "Glucose source is too slow for live display",
+            "description": "The glucose source {entity} delivers a reading about every {minutes} minutes. GlucoCraft needs a reading every 5 minutes or more often to show a current value, so this source is not supported for live display. The trend, the 5-minute change and \"No current data\" do not work as intended with it, and the displays can show \"No current data\" between readings. Readings are still stored and shown in the graphs. To correct this, use a source that updates more often; where the integration has an update interval, check its options. Otherwise, setting No current data after to 30 minutes reduces the \"No current data\" messages, but a real interruption then takes up to 30 minutes to show. This notice closes by itself when the readings arrive more often."
+        },
+        "sensor_cap": {
+            "title": "Glucose source stays at {value_mgdl} mg/dL ({value_mmol} mmol/L)",
+            "description": "The readings of {entity} repeatedly stay at exactly {value_mgdl} mg/dL ({value_mmol} mmol/L) and never go above it. This can mean that the CGM sensor's upper limit is {value_mgdl} mg/dL and that readings above it arrive as that number instead of \"HI\". If so, set *Sensor upper limit* for this source to {value_mgdl} mg/dL (Settings > Devices & services > GlucoCraft > Configure > Glucose sources): then readings at or above it are shown as HI, left out of the calculated values and counted as very high; stored readings are not changed. This method is a GlucoCraft rule (Documentation: *Readings Outside the Sensor's Range*). It is the user's responsibility to know their CGM system and to adjust these settings where necessary. This notice closes by itself when the setting matches or a higher reading arrives."
+        },
+        "sensor_floor": {
+            "title": "Glucose source stays at {value_mgdl} mg/dL ({value_mmol} mmol/L)",
+            "description": "The readings of {entity} repeatedly stay at exactly {value_mgdl} mg/dL ({value_mmol} mmol/L) and never go below it. This can mean that the CGM sensor's lower limit is {value_mgdl} mg/dL and that readings below it arrive as that number instead of \"LO\". If so, set *Sensor lower limit* for this source to {value_mgdl} mg/dL (Settings > Devices & services > GlucoCraft > Configure > Glucose sources): then readings at or below it are shown as LO, left out of the calculated values and counted as very low; stored readings are not changed. This method is a GlucoCraft rule (Documentation: *Readings Outside the Sensor's Range*). It is the user's responsibility to know their CGM system and to adjust these settings where necessary. This notice closes by itself when the setting matches or a lower reading arrives."
+        },
+        "source_mmol_too_high": {
+            "title": "Glucose source states mmol/L with values that look like another unit",
+            "description": "The glucose source {entity} states the unit mmol/L, and its last 10 readings in a row were above 33.3 mmol/L (600 mg/dL). The values may be in another unit, for example mg/dL values labeled mmol/L. GlucoCraft still uses them: they are stored at the sensor's upper limit and shown as HI, and readings already stored are not changed. Give the entity its correct unit (for example in its template sensor) or choose another source in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when the source sends a value of 33.3 mmol/L or less."
+        },
+        "source_mgdl_too_low": {
+            "title": "Glucose source states mg/dL with values that look like mmol/L",
+            "description": "The glucose source {entity} states the unit mg/dL, and its last 10 readings in a row were below 30 mg/dL. The values may be in another unit, for example mmol/L values labeled mg/dL. GlucoCraft still treats them as mg/dL: values it cannot use count as no reading, and the others are stored at the sensor's lower limit and shown as LO. Readings already stored are not changed. Give the entity its correct unit (for example in its template sensor) or choose another source in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when the source sends a value of 30 mg/dL or more."
+        },
+        "source_time_attribute": {
+            "title": "Measurement-time attribute holds no usable time",
+            "description": "The setting *Measurement-time attribute* for the glucose source {entity} names the attribute {attribute}, and the source's last 10 readings had no usable time there: the attribute is missing or holds something else. These readings take the time they arrive, so readings from a source that delivers late look newer than they are. Correct the name or clear the setting (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when a reading has a usable time under that name."
+        },
+        "fast_source": {
+            "title": "Glucose source updates too often to add readings",
+            "description": "The glucose source {entity} has sent new values less than 15 seconds apart for at least 10 minutes. A new value within 15 seconds of a stored reading counts as the same measurement and replaces it, so the current value updates but no readings are added to the history. CGM systems send a reading every 1 to 5 minutes, so this usually comes from a sensor that recalculates, such as a template sensor. Have the source update less often or choose another source in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when readings are added again or the values stop arriving."
+        },
+        "source_is_glucocraft": {
+            "title": "A GlucoCraft entity is set as a glucose source",
+            "description": "{entity} is an entity of GlucoCraft itself. Its value is GlucoCraft's own last reading, not a CGM reading, so its values are not used. Choose the CGM integration's sensor as the source in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes when another source is chosen."
+        },
+        "clock_behind": {
+            "title": "Stored glucose readings are later than the system clock",
+            "fix_flow": {
+                "step": {
+                    "confirm": {
+                        "title": "Stored glucose readings are later than the system clock",
+                        "description": "GlucoCraft has stored readings up to {newest}, but the system clock of Home Assistant shows {now}. Either the clock is behind, or these readings were stored while the clock was ahead. Until the clock reaches {newest}, GlucoCraft stores no new readings and removes no stored readings, and its status is *no current data*.\n\nWhen the clock is wrong, correcting it closes this notice by itself and keeps every reading. When the clock is right, the readings later than it can be discarded here; this cannot be undone.",
+                        "data": {
+                            "discard": "Discard the stored readings that are later than the system clock"
+                        }
+                    }
+                },
+                "error": {
+                    "discard_required": "Nothing was discarded: the box was not ticked."
+                },
+                "abort": {
+                    "not_loaded": "GlucoCraft is not running, so nothing can be discarded now, and this notice stays open. Start GlucoCraft (Settings > Devices & services > GlucoCraft) and open this notice again."
+                }
+            }
+        },
+        "entity_ids_changed": {
+            "title": "Entity ids of GlucoCraft were changed",
+            "fix_flow": {
+                "step": {
+                    "confirm": {
+                        "title": "Entity ids of GlucoCraft were changed",
+                        "description": "These entities no longer have the ids GlucoCraft gave them:\n\n{changed}\n\nGlucoCraft's cards, its dashboard and the wall panels find these entities by their original ids, so while the ids differ they can show no reading or a reading that is not current. A new name for a device or an entity in Home Assistant can change its entity ids.\n\nSubmit gives these entities their original ids. Their recorded history stays with them. Anything else that was pointed at the changed ids, such as an automation or a dashboard of your own, then has to be pointed back at the original ids."
+                    }
+                },
+                "abort": {
+                    "id_taken": "These ids could not be put back, because another entity has the original id:\n\n{blocked}\n\nThe other ids were put back. This notice stays open until that other entity has been renamed or deleted and this notice has been opened again."
+                }
+            }
+        },
+        "entity_ids_put_back": {
+            "title": "GlucoCraft put its entity ids back",
+            "description": "These entities were given other ids, and GlucoCraft gave them their original ids back:\n\n{changed}\n\nGlucoCraft's cards, its dashboard and the wall panels find these entities by their original ids, so GlucoCraft keeps them. This is necessary so that GlucoCraft can continue to function properly. The name shown for an entity or a device can be changed freely: if Home Assistant offers to change the entity ids as well, leave them as they are. This notice stays until it is dismissed."
+        },
+        "dashboard_failed": {
+            "title": "GlucoCraft's dashboard could not be added",
+            "description": "Home Assistant did not accept GlucoCraft's dashboard: {error}. The GlucoCraft dashboard is therefore not in the sidebar, and its pages, among them Documentation and CGM Report, cannot be opened. GlucoCraft's cards remain available to other dashboards, and the actions Print report and Export readings as CSV remain available. This can follow a Home Assistant update. GlucoCraft tries again at its next start (a restart of Home Assistant, or a reload of GlucoCraft); this notice closes by itself once the dashboard is added, or when *Dashboard in the sidebar* is turned off."
+        },
+        "clock_ahead": {
+            "title": "The system clock may be ahead of the glucose readings",
+            "description": "The glucose source's newest readings were measured at {newest}, but the system clock of Home Assistant shows {now}. Either the system clock is ahead, or the source delivers its readings late. GlucoCraft stores each reading at its own measurement time, so its status is *no current data* while this lasts. Readings without their own measurement time are stored at the clock's time; once the clock is corrected, a notice lets you discard them. Check the time settings of the Home Assistant host and its network time. This notice closes by itself when the readings' measurement times match the clock again."
+        },
+        "storage_recovered": {
+            "title": "GlucoCraft's readings file was damaged; the readings were recovered",
+            "description": "GlucoCraft's readings file in {folder} was damaged. The readings that could be read were recovered and are saved again; an exact copy of the damaged file is kept as {file}. This notice closes at the next restart."
+        },
+        "storage_save_failed": {
+            "title": "GlucoCraft's readings file could not be written",
+            "description": "GlucoCraft's readings file in {folder} could not be written ({error}). New readings are kept in memory and are lost if Home Assistant restarts before the file can be written again. Check the free space and the permissions of the folder. This notice closes by itself when the file is written again."
+        },
+        "storage_damaged": {
+            "title": "GlucoCraft's readings file was damaged",
+            "description": "GlucoCraft's readings file in {folder} could not be read as readings. It was kept as {file} and GlucoCraft started with an empty history, filled from Home Assistant's history where it still holds the readings. A copy of the folder from a backup made before the damage can be restored while Home Assistant is stopped. This notice closes at the next restart."
+        },
+        "storage_unreadable": {
+            "title": "GlucoCraft's readings file could not be read",
+            "description": "GlucoCraft's readings file in {folder} could not be read (a storage or permission error). To protect the readings in it, GlucoCraft does not write to this file until GlucoCraft starts again (a restart of Home Assistant, or a reload of GlucoCraft, which saving its settings also does). GlucoCraft started with an empty history, filled from Home Assistant's history where it still holds the readings; these readings and the readings received since the start are kept in memory only. They are lost when GlucoCraft starts again, except those Home Assistant's recorder still holds for the glucose source, which GlucoCraft imports again then. Correct the storage or permission problem, then restart Home Assistant. This notice closes when the file is read normally at a start."
+        },
+        "storage_newer": {
+            "title": "GlucoCraft's readings file is from a newer version of GlucoCraft",
+            "description": "GlucoCraft's readings file in {folder} was written by a newer version of GlucoCraft, in a format this version cannot read. To protect the readings in it, GlucoCraft neither reads nor writes this file. GlucoCraft started with an empty history, filled from Home Assistant's history where it still holds the readings; these readings and the readings received since the start are kept in memory only. They are lost when GlucoCraft starts again, except those Home Assistant's recorder still holds for the glucose source, which GlucoCraft imports again then. Install the newer version of GlucoCraft again, then restart Home Assistant. This notice closes when the file is read normally at a start."
+        },
+        "storage_recovered_not_kept": {
+            "title": "GlucoCraft's readings file was damaged; the readings were recovered",
+            "description": "GlucoCraft's readings file in {folder} was damaged. The readings that could be read were recovered, but no copy of the damaged file could be kept, so GlucoCraft does not write to the file until GlucoCraft starts again (a restart of Home Assistant, or a reload of GlucoCraft, which saving its settings also does). The recovered readings and the readings received since the start are kept in memory only. They are lost when GlucoCraft starts again, except those Home Assistant's recorder still holds for the glucose source, which GlucoCraft imports again then; the file itself is not changed. Correct the storage problem (for example a full or read-only storage), then restart Home Assistant. This notice is shown again at each start until a copy of the file can be kept."
+        },
+        "storage_damaged_not_kept": {
+            "title": "GlucoCraft's readings file was damaged",
+            "description": "GlucoCraft's readings file in {folder} could not be read as readings. It could not be moved aside, so GlucoCraft does not write to it until GlucoCraft starts again (a restart of Home Assistant, or a reload of GlucoCraft, which saving its settings also does). GlucoCraft started with an empty history, filled from Home Assistant's history where it still holds the readings; these readings and the readings received since the start are kept in memory only. They are lost when GlucoCraft starts again, except those Home Assistant's recorder still holds for the glucose source, which GlucoCraft imports again then. A copy of the folder from a backup made before the damage can be restored while Home Assistant is stopped. This notice is shown again at each start until the file can be moved aside."
+        },
+        "range_below_sensor_limit": {
+            "title": "The very-low limit is below the glucose sensor's lower limit",
+            "description": "The very-low limit in GlucoCraft's settings, {stored}, is lower than the lower limit of the glucose sensor, {limit}. The sensor reports every reading below {limit} as LO, so a LO reading could not be counted as very low. GlucoCraft therefore uses {used} as the very-low limit for now. The limit can be changed in Settings > Devices & services > GlucoCraft > Configure > Glucose ranges. This notice closes by itself when the limit in the settings fits the sensor again."
+        },
+        "range_above_sensor_limit": {
+            "title": "The very-high limit is above the glucose sensor's upper limit",
+            "description": "The very-high limit in GlucoCraft's settings, {stored}, is higher than the upper limit of the glucose sensor, {limit}. The sensor reports every reading above {limit} as HI, so a HI reading could not be counted as very high. GlucoCraft therefore uses {used} as the very-high limit for now. The limit can be changed in Settings > Devices & services > GlucoCraft > Configure > Glucose ranges. This notice closes by itself when the limit in the settings fits the sensor again."
+        },
+        "lovelace_resources_failed": {
+            "title": "GlucoCraft's cards could not be added to the dashboards",
+            "description": "GlucoCraft could not add its card files as dashboard resources ({error}), so GlucoCraft's dashboard and its cards may not load. The card files can be added by hand: with *Advanced mode* on in the user profile, open Settings > Dashboards > the menu (three dots) > *Resources* > *Add resource*, and add each of /glucocraft/glucocraft-display-card.js, /glucocraft/glucocraft-strategy.js, /glucocraft/glucocraft-ui.js, /glucocraft/glucocraft-docs.js and /glucocraft/glucocraft-report.js with the resource type *JavaScript module*. This notice closes by itself at the next start of GlucoCraft at which the resources are added."
+        },
+        "history_import_failed": {
+            "title": "GlucoCraft could not read the glucose history",
+            "description": "GlucoCraft could not read the glucose source's history from Home Assistant's recorder ({error}), so readings that Home Assistant recorded are missing from GlucoCraft's history. New readings are stored as they arrive. This notice closes by itself when the history can be read, and at the next restart of Home Assistant."
+        },
+        "source_stuck": {
+            "title": "Glucose source may have stopped: the same value for over an hour",
+            "description": "The glucose source {entity} has delivered exactly the same value for its last {count} readings, over {minutes} minutes. The displays are showing this value as current and steady, although the source may have stopped.\n\n**Why GlucoCraft cannot tell:** this source sends a value but no time of measurement, so GlucoCraft has to use the time each value arrives in Home Assistant. A source that keeps sending its last value looks the same as a steady glucose level.\n\n**To correct it:**\n1. Check that the CGM sensor and its app are working and show a current reading. If they do not, the sensor or its connection has stopped, and the value on the displays is not current.\n2. In Developer tools > States, open {entity} and look for an attribute that holds the time of each measurement. If there is one, enter its name as the measurement-time attribute in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). GlucoCraft then no longer counts a repeated value as a new reading.\n3. If there is no such attribute, use a source that provides one, such as an integration that reads the CGM's own data.\n\nIf your glucose really has stayed this steady, no action is needed. This notice closes by itself when the value changes."
+        },
+        "hand_limit_low": {
+            "title": "Glucose source sends numbers below the sensor lower limit set by hand",
+            "description": "The glucose source {entity} sent the number {value}, although *Sensor lower limit* is set by hand to {limit} for this source. GlucoCraft shows every reading below that limit as LO, without its number, and leaves it out of the calculated values. A source that sends such numbers can measure there, so the CGM sensor's lower limit may differ from the setting. Check the CGM sensor's measurement range and the setting *Sensor lower limit* (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This method is a GlucoCraft rule (Documentation: *Readings Outside the Sensor's Range*). It is the user's responsibility to know their CGM system and to adjust these settings where necessary. This notice closes when the setting is changed or Home Assistant restarts, and opens again with the next such number."
+        },
+        "sensor_at_lower_limit": {
+            "title": "Glucose source stays at its lower limit, {value_mgdl} mg/dL ({value_mmol} mmol/L), as a number",
+            "description": "The readings of {entity} repeatedly stay at exactly {value_mgdl} mg/dL ({value_mmol} mmol/L), the lower limit GlucoCraft uses for this source (*Sensor lower limit*: Automatic), and arrive as that number, not as \"LO\". GlucoCraft therefore shows them as measured readings. If this source sends \"LO\" as this number, set *Sensor lower limit* for this source by hand to {value_mgdl} mg/dL (Settings > Devices & services > GlucoCraft > Configure > Glucose sources): then readings at that value are shown as LO, left out of the calculated values and counted as very low; stored readings are not changed. This method is a GlucoCraft rule (Documentation: *Readings Outside the Sensor's Range*). It is the user's responsibility to know their CGM system and to adjust these settings where necessary. This notice closes by itself when the limit is set by hand."
+        },
+        "hand_limit_high": {
+            "title": "Glucose source sends numbers above the sensor upper limit set by hand",
+            "description": "The glucose source {entity} sent the number {value}, although *Sensor upper limit* is set by hand to {limit} for this source. GlucoCraft shows every reading above that limit as HI, without its number, and leaves it out of the calculated values. A source that sends such numbers can measure there, so the CGM sensor's upper limit may differ from the setting. Check the CGM sensor's measurement range and the setting *Sensor upper limit* (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This method is a GlucoCraft rule (Documentation: *Readings Outside the Sensor's Range*). It is the user's responsibility to know their CGM system and to adjust these settings where necessary. This notice closes when the setting is changed or Home Assistant restarts, and opens again with the next such number."
+        },
+        "sensor_at_upper_limit": {
+            "title": "Glucose source stays at its upper limit, {value_mgdl} mg/dL ({value_mmol} mmol/L), as a number",
+            "description": "The readings of {entity} repeatedly stay at exactly {value_mgdl} mg/dL ({value_mmol} mmol/L), the upper limit GlucoCraft uses for this source (*Sensor upper limit*: Automatic), and arrive as that number, not as \"HI\". GlucoCraft therefore shows them as measured readings. If this source sends \"HI\" as this number, set *Sensor upper limit* for this source by hand to {value_mgdl} mg/dL (Settings > Devices & services > GlucoCraft > Configure > Glucose sources): then readings at that value are shown as HI, left out of the calculated values and counted as very high; stored readings are not changed. This method is a GlucoCraft rule (Documentation: *Readings Outside the Sensor's Range*). It is the user's responsibility to know their CGM system and to adjust these settings where necessary. This notice closes by itself when the limit is set by hand."
+        },
+        "expiry_entity_missing": {
+            "title": "CGM sensor expiry entity not found",
+            "description": "The entity {entity}, set as *CGM sensor expiry entity* in GlucoCraft's settings, does not exist in Home Assistant, so GlucoCraft cannot show the sensor's expiry or see a new sensor from it. Choose the entity of the CGM integration that holds the sensor's expiry, or clear the setting (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when the entity exists again or the setting is changed."
+        },
+        "expiry_entity_unrecognized": {
+            "title": "CGM sensor expiry entity holds no expiry",
+            "description": "The entity {entity}, set as *CGM sensor expiry entity* in GlucoCraft's settings, has held a value that is no expiry at its last 10 checks, over about 50 minutes. GlucoCraft reads a date, a date and time, a Unix time, or a time left in days, hours or minutes. Without an expiry GlucoCraft cannot show the sensor's expiry or see a new sensor from it. Check that it is the entity of the CGM integration that holds the sensor's expiry, or clear the setting *CGM sensor expiry entity* (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when the entity holds an expiry or the setting is changed."
+        },
+        "expiry_entity_past": {
+            "title": "CGM sensor expiry entity shows an expiry long past",
+            "description": "The entity {entity}, set as *CGM sensor expiry entity* in GlucoCraft's settings, gives the expiry {expiry}, more than a day ago, while readings still arrive. The displays therefore show the sensor as expired. The entity may hold another time, such as the sensor's start or its last reading, or it may have stopped updating. Check that it is the entity of the CGM integration that holds the sensor's expiry, or clear the setting *CGM sensor expiry entity* (Settings > Devices & services > GlucoCraft > Configure > Glucose sources). This notice closes by itself when the expiry is no longer more than a day past, the readings stop, or the setting is changed."
+        }
+    },
+    "exceptions": {
+        "not_loaded": {
+            "message": "GlucoCraft is not loaded: it is not set up, or its setup has not finished or has failed. Check Settings > Devices & services > GlucoCraft; the action works once GlucoCraft is loaded."
+        },
+        "lab_invalid": {
+            "message": "The laboratory A1C result was not stored: {error}"
+        },
+        "print_failed": {
+            "message": "The CGM Report was not printed: {reason}. The PDF is kept as {file} in the glucocraft_reports folder."
+        },
+        "print_failed_not_kept": {
+            "message": "The CGM Report was not printed: {reason}. No copy of the PDF could be kept in the glucocraft_reports folder; the notification GlucoCraft CGM Report says why."
+        },
+        "print_pdf_failed": {
+            "message": "The CGM Report was not printed: its PDF could not be created ({reason}). Nothing was sent to the printer."
+        },
+        "export_failed": {
+            "message": "The export was not completed: the CSV files could not be written in the glucocraft_exports folder ({reason})."
+        },
+        "import_no_file": {
+            "message": "Nothing was imported: no such CSV export in the {folder} folder of the Home Assistant configuration. Name a file in that folder (without a folder), or leave the name empty for the newest export there."
+        },
+        "import_not_an_export": {
+            "message": "Nothing was imported: {file} is not a readings export of GlucoCraft (its header row has no time or glucose column)."
+        },
+        "import_failed": {
+            "message": "Nothing was imported: the file could not be read ({reason})."
+        },
+        "print_no_printer": {
+            "message": "The CGM Report was not printed: no printer address is set in GlucoCraft's settings (Settings > Devices & services > GlucoCraft > Configure > Report and dashboard > Report printer). No PDF was created; the PDF can be downloaded on the CGM Report page of the GlucoCraft dashboard (while the setting Dashboard in the sidebar is on)."
+        },
+        "lab_remove_failed": {
+            "message": "The laboratory A1C result was not removed: {reason}."
+        },
+        "summary_failed": {
+            "message": "The summary was not sent: {reason}."
+        },
+        "custom_appendix_off": {
+            "message": "The appendix Custom Ranges and Goals is available only while the optional feature Custom ranges and goals is on (Settings > Devices & services > GlucoCraft > Configure > Optional features)."
+        },
+        "lab_add_failed": {
+            "message": "The laboratory A1C result was not stored: {reason}."
+        },
+        "report_period": {
+            "message": "This report period is not available: {days} days. The CGM Report can be created for 14, 30, 90 or 180 days. Check the card's or automation's settings."
+        }
+    },
+    "entity": {
+        "sensor": {
+            "current_glucose": {
+                "name": "Last glucose reading",
+                "state_attributes": {
+                    "zone": {
+                        "state": {
+                            "very_low": "Very low",
+                            "low": "Low",
+                            "near_low": "In range, below the tight range",
+                            "tight_range": "Tight range",
+                            "near_high": "In range, above the tight range",
+                            "high": "High",
+                            "very_high": "Very high"
+                        }
+                    },
+                    "limit": {
+                        "state": {
+                            "low": "LO",
+                            "high": "HI"
+                        }
+                    }
+                }
+            },
+            "status": {
+                "name": "Status",
+                "state": {
+                    "warm_up": "Sensor warming up",
+                    "expired": "Sensor expired",
+                    "no_data": "No data yet",
+                    "no_current_data": "No current data",
+                    "expiring_soon": "Sensor expiring soon",
+                    "current": "Current data"
+                }
+            },
+            "configuration": {
+                "name": "Configuration",
+                "state": {
+                    "consensus_ranges": "Consensus ranges",
+                    "custom_ranges": "Custom ranges"
+                }
+            },
+            "spoken_summary": {
+                "name": "Spoken summary"
+            },
+            "delta_5min": {
+                "name": "5-minute delta"
+            },
+            "last_reading": {
+                "name": "Last reading time"
+            },
+            "trend_arrow": {
+                "name": "Trend arrow"
+            },
+            "active_source": {
+                "name": "Active source"
+            },
+            "data_maturity": {
+                "name": "Data history",
+                "state": {
+                    "no_data": "No data",
+                    "less_than_6_hours": "Less than 6 hours",
+                    "6_hours": "6 hours",
+                    "24_hours": "24 hours",
+                    "7_days": "7 days",
+                    "14_days": "14 days",
+                    "30_days": "30 days",
+                    "90_days": "90 days",
+                    "180_days": "180 days"
+                }
+            },
+            "weekly_summary": {
+                "name": "Weekly statistics"
+            },
+            "change_over_time": {
+                "name": "Change over time"
+            },
+            "sensor_expiry": {
+                "name": "Sensor expiry",
+                "state": {
+                    "not_configured": "Not configured",
+                    "no_value": "No value",
+                    "unknown_format": "Unknown format",
+                    "not_expired": "Not expired",
+                    "expiring_soon": "Expiring soon",
+                    "expired": "Expired"
+                }
+            },
+            "period_mean": {
+                "name": "{period} mean"
+            },
+            "period_std_dev": {
+                "name": "{period} standard deviation"
+            },
+            "period_cv": {
+                "name": "{period} CV"
+            },
+            "period_gmi": {
+                "name": "{period} GMI"
+            },
+            "period_consensus": {
+                "name": "{period} consensus ranges"
+            },
+            "period_custom": {
+                "name": "{period} custom ranges"
+            },
+            "period_tir": {
+                "name": "{period} custom time in range"
+            },
+            "period_titr": {
+                "name": "{period} custom time in tight range"
+            },
+            "period_time_low": {
+                "name": "{period} custom time low"
+            },
+            "period_time_high": {
+                "name": "{period} custom time high"
+            },
+            "period_time_critical_low": {
+                "name": "{period} custom time very low"
+            },
+            "period_time_critical_high": {
+                "name": "{period} custom time very high"
+            },
+            "period_min": {
+                "name": "{period} minimum"
+            },
+            "period_max": {
+                "name": "{period} maximum"
+            },
+            "period_data_availability": {
+                "name": "{period} sensor active"
+            },
+            "period_readings": {
+                "name": "{period} readings"
+            },
+            "period_gri": {
+                "name": "{period} GRI"
+            }
+        },
+        "binary_sensor": {
+            "is_low": {
+                "name": "Glucose below range"
+            },
+            "is_high": {
+                "name": "Glucose above range"
+            },
+            "is_critical_low": {
+                "name": "Glucose very low"
+            },
+            "is_critical_high": {
+                "name": "Glucose very high"
+            },
+            "is_stale": {
+                "name": "No current data"
+            },
+            "sensor_warmup": {
+                "name": "Sensor warm-up"
+            },
+            "in_range": {
+                "name": "Glucose in range"
+            },
+            "in_tight_range": {
+                "name": "Glucose in tight range"
+            },
+            "using_custom_ranges": {
+                "name": "Using custom ranges"
+            }
+        }
+    }
+}

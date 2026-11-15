@@ -1,0 +1,94 @@
+name: Bug report
+description: Something in GlucoCraft does not work as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One problem per report. Issues are public: do not include glucose values, health information, names,
+        addresses, tokens, passwords, wall-panel addresses, webhook ids or screenshots that show any of these. Report
+        a security vulnerability privately (SECURITY.md).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: The part of GlucoCraft the problem is in. A problem with a screen reader, contrast, the keyboard or
+        motion is reported with the area Accessibility.
+      options:
+        - Integration
+        - Dashboard
+        - Display card
+        - Wall panel
+        - CGM Report
+        - Documentation
+        - Accessibility
+        - Other
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      description: Settings > About.
+    validations:
+      required: true
+  - type: input
+    id: glucocraft_version
+    attributes:
+      label: GlucoCraft version
+      description: The integration's version, in the diagnostics file (`version`) or on the GlucoCraft device page.
+    validations:
+      required: true
+  - type: input
+    id: panel_version
+    attributes:
+      label: Wall panel type and version
+      description: Only when a wall panel or a display card is involved. The version is on the panel's About page.
+  - type: input
+    id: source
+    attributes:
+      label: Source integration
+      description: The integration that provides the glucose readings, with its version, or the synthetic data of `tools/synth`.
+    validations:
+      required: true
+  - type: dropdown
+    id: unit
+    attributes:
+      label: Display unit
+      options:
+        - mg/dL
+        - mmol/L
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Each step, from the start, so that someone else can repeat it.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What the documentation describes
+      description: What GlucoCraft is designed to do at this point, with the section of the README or the Documentation page.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: What GlucoCraft did instead, with any message from Home Assistant's log (Settings > System > Logs).
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics file (optional)
+      description: |
+        Settings > Devices & services > GlucoCraft > the menu (three dots) > Download diagnostics. Drag the file
+        into this field. The file contains no glucose values or readings and redacts the entity ids of the
+        sources, the phones' notify actions, the printer address and the id of the wall-panel address. Read it before
+        attaching it.

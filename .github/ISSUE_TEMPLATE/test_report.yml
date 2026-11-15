@@ -1,0 +1,77 @@
+name: Test report
+description: What was tested and what was found, including tests that found nothing.
+labels: ["test report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A test report records what was checked, how, and the result. Report each problem found as a separate bug
+        report. Issues are public: do not include glucose values, health information, names, addresses, tokens,
+        passwords, wall-panel addresses, webhook ids or screenshots that show any of these.
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+    validations:
+      required: true
+  - type: input
+    id: glucocraft_version
+    attributes:
+      label: GlucoCraft version
+    validations:
+      required: true
+  - type: input
+    id: panel_version
+    attributes:
+      label: Wall panel type and version
+      description: Only when a wall panel was tested.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area tested
+      multiple: true
+      options:
+        - Installation, update or removal
+        - Settings
+        - Statistics
+        - Dashboard pages
+        - CGM Report and PDF
+        - Notifications
+        - Display card
+        - Wall panel
+        - Accessibility (screen reader, contrast, keyboard)
+        - Texts and translations
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: data
+    attributes:
+      label: Data used
+      description: The source integration and its version, or the synthetic data of `tools/synth` (scenario or generator settings).
+    validations:
+      required: true
+  - type: dropdown
+    id: unit
+    attributes:
+      label: Display unit
+      options:
+        - mg/dL
+        - mmol/L
+        - Both
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: What was tested, and how
+      description: The steps, and what was compared (for example a value with the documented calculation).
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Result
+      description: What matched the documentation and what did not, with links to any bug reports opened.
+    validations:
+      required: true

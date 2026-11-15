@@ -1,0 +1,104 @@
+send_daily_summary:
+  name: Send daily summary
+  description: Creates the GlucoCraft daily summary notification immediately (the last reading, the rolling 24 hours, and the time in range of the last 14 days compared with the last 90 days once both periods have enough data), also while the scheduled daily summary is off. It replaces the previous daily summary and is also sent to any phones or notify actions chosen to receive the summaries (Configure > Notifications). For administrators only; automations and scripts can also call it.
+send_weekly_summary:
+  name: Send weekly summary
+  description: Creates the GlucoCraft weekly summary notification immediately (rolling 7 and 14 days, and the time in range of the last 14 days compared with the last 90 days when both periods have enough data and the difference is 5 percentage points or more), also while the scheduled weekly summary is off. It replaces the previous weekly summary and is also sent to any phones or notify actions chosen to receive the summaries (Configure > Notifications). For administrators only; automations and scripts can also call it.
+send_monthly_summary:
+  name: Send monthly summary
+  description: Creates the GlucoCraft monthly summary notification immediately (rolling 30 and 90 days and 6 months), with the time in range of the last 30 days compared with the last 90 days and with the last 6 months when both periods compared have enough data and the difference is 5 percentage points or more, also while the scheduled weekly summary, which brings the monthly summary, is off. It replaces the previous monthly summary and is also sent to any phones or notify actions chosen to receive the summaries (Configure > Notifications). For administrators only; automations and scripts can also call it.
+add_lab_a1c:
+  name: Add laboratory A1C
+  description: Stores a laboratory A1C (glycated hemoglobin) result for the CGM Report, which compares it with the glucose management indicator (GMI) of the 90 days ending on its date. The GMI is shown beside it only with at least 70% sensor active in those 90 days (the condition of Battelino et al., 2019); a result whose 90 days begin before the 200 days of readings that GlucoCraft keeps has no CGM comparison. This method is a GlucoCraft rule. A result with the same date is replaced. For administrators only; automations and scripts can also call it.
+  fields:
+    date:
+      name: Date
+      description: Date of the blood test.
+      required: true
+      selector:
+        date:
+    a1c:
+      name: A1C
+      description: "Laboratory A1C in the unit chosen below: percent from 3 to 20, kept with one decimal, or mmol/mol from 9 to 195, kept in whole numbers."
+      required: true
+      selector:
+        number:
+          min: 3
+          max: 195
+          step: 0.1
+          mode: box
+    unit:
+      name: Unit
+      description: "Unit of the A1C entered: percent (NGSP, National Glycohemoglobin Standardization Program units), or mmol/mol (IFCC, International Federation of Clinical Chemistry and Laboratory Medicine units). A result in mmol/mol is kept in whole mmol/mol and converted to percent with the IFCC–NGSP master equation (Hoelzel et al., 2004). Default: percent."
+      default: percent
+      selector:
+        select:
+          options: ["percent", "mmol_mol"]
+          translation_key: lab_a1c_unit
+remove_lab_a1c:
+  name: Remove laboratory A1C
+  description: Removes the laboratory A1C result of the given date. When no result exists for that date, nothing is changed. For administrators only; automations and scripts can also call it.
+  fields:
+    date:
+      name: Date
+      description: Date of the blood test to remove.
+      required: true
+      selector:
+        date:
+export_csv:
+  name: Export readings as CSV
+  description: Saves every stored reading (the local time and the Coordinated Universal Time (UTC), the value in mg/dL and in the display unit, the source, and the LO / HI flag of a reading outside the sensor's measurement range) and the laboratory A1C results as CSV (comma-separated values) files in the glucocraft_exports folder of the Home Assistant configuration. The last 12 exports are kept; older export files are deleted. Removing GlucoCraft deletes every CSV export in this folder (files of other names are kept); to keep an export, copy it elsewhere. The action Import readings from CSV reads an export back in, also after a reinstall. The folder is not accessible from the web; it is reached through access to the Home Assistant configuration folder. A notification confirms the export. For administrators only; automations and scripts can also call it.
+import_csv:
+  name: Import readings from CSV
+  description: "Reads one of GlucoCraft's own CSV exports back in: its readings (in either display unit, also when a spreadsheet program saved it again with the decimal comma) and the laboratory A1C results of the export with the same time stamp. Readings already stored win: a reading within 30 seconds of a stored reading is not imported, and a stored reading is never changed or doubled; a laboratory result of a date already stored is kept as it is. Only readings within the 200 days that GlucoCraft keeps are imported. A notification states how many readings were imported; the action also returns the counts as its response. For administrators only; automations and scripts can also call it."
+  fields:
+    file:
+      name: File
+      description: "The name of the readings export (a name that begins with glucocraft-readings_, followed by its date and time, and ends with .csv) in the glucocraft_exports folder of the Home Assistant configuration, without a folder. A file copied in from elsewhere is put into that folder first. Empty: the newest export there."
+      required: false
+      selector:
+        text:
+print_report:
+  name: Print report
+  description: Creates the GlucoCraft CGM Report as a PDF and sends it to the printer set in GlucoCraft's settings (Configure > Report and dashboard > Report printer); CGM stands for continuous glucose monitoring. Each PDF, printed or downloaded on the CGM Report page, is also kept in the glucocraft_reports folder of the Home Assistant configuration; the last 12 are kept, and removing GlucoCraft deletes every report PDF in this folder (files of other names are kept). Without a printer address, no PDF is created and the action fails. After each attempt the notification GlucoCraft CGM Report states the result; the action returns it as its response when the report was sent, and fails with the reason otherwise. The two appendices are included only when chosen. For administrators only; automations and scripts can also call it.
+  fields:
+    days:
+      name: Period
+      description: "Number of days, ending at the last midnight. Default: 14 days."
+      default: 14
+      selector:
+        select:
+          options: ["14", "30", "90", "180"]
+          translation_key: report_days
+    report:
+      name: Report
+      description: "Summary: the 14-day section (time in ranges, glucose metrics, the glucose profile and the daily glucose profiles), the longer-term overview (30 days and longer), the weekly trend (90 days and 6 months), Hypoglycemia, Hyperglycemia, the comparison with the previous period (not in the 6-month report), Data Quality and Laboratory A1C. Full report: also Hypoglycemia Events by Period, the daily glucose profiles of the whole period (30 days and longer), Daily Patterns, the Daily Summary, the Daily Log and the Monthly Summary (every calendar month of the period). Default: Summary."
+      default: summary
+      selector:
+        select:
+          options: ["summary", "full"]
+          translation_key: report_kind
+    color:
+      name: Color
+      description: Color (on) or grayscale (off). On by default.
+      default: true
+      selector:
+        boolean:
+    two_sided:
+      name: Two-sided
+      description: Two-sided printing where the printer supports it. On by default.
+      default: true
+      selector:
+        boolean:
+    include_custom_appendix:
+      name: Include the custom ranges and goals appendix
+      description: The appendix *Custom Ranges and Goals* shows the statistics calculated with the ranges and goals in the settings, labeled as the user's own settings; the main report always uses the consensus ranges. Available only while the optional feature Custom ranges and goals is on. Off by default.
+      default: false
+      selector:
+        boolean:
+    include_research_appendix:
+      name: Include the research measures appendix
+      description: The appendix *Measures Defined for Research* shows measures that research publications define but the clinical-care standards do not; no targets. Off by default.
+      default: false
+      selector:
+        boolean:

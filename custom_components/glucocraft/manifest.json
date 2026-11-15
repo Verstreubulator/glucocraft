@@ -1,0 +1,15 @@
+{
+    "domain": "glucocraft",
+    "name": "GlucoCraft",
+    "after_dependencies": ["lovelace", "recorder"],
+    "codeowners": ["@Verstreubulator"],
+    "config_flow": true,
+    "dependencies": ["http", "frontend", "webhook"],
+    "documentation": "https://github.com/Verstreubulator/glucocraft",
+    "integration_type": "service",
+    "iot_class": "calculated",
+    "issue_tracker": "https://github.com/Verstreubulator/glucocraft/issues",
+    "requirements": ["reportlab==4.2.5"],
+    "single_config_entry": true,
+    "version": "0.0.1"
+}

@@ -1,0 +1,5 @@
+# The tests on Home Assistant itself (tests_ha/), on the oldest Home Assistant that GlucoCraft supports (hacs.json:
+# 2026.3.1, the oldest release the test harness exists for). Used as tests_ha/requirements.txt is (see there).
+pytest-homeassistant-custom-component==0.13.317  # Home Assistant 2026.3.1 and its test harness
+home-assistant-frontend==20260304.0  # the frontend of that release
+reportlab==4.2.5  # GlucoCraft's own requirement (manifest.json)

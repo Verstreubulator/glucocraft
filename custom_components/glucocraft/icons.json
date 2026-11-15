@@ -1,0 +1,168 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "is_low": {
+        "default": "mdi:arrow-down-bold"
+      },
+      "is_high": {
+        "default": "mdi:arrow-up-bold"
+      },
+      "is_critical_low": {
+        "default": "mdi:alert"
+      },
+      "is_critical_high": {
+        "default": "mdi:alert-octagon"
+      },
+      "is_stale": {
+        "default": "mdi:clock-alert",
+        "state": {
+          "off": "mdi:clock-outline"
+        }
+      },
+      "sensor_warmup": {
+        "default": "mdi:thermometer-alert",
+        "state": {
+          "off": "mdi:thermometer"
+        }
+      },
+      "in_range": {
+        "default": "mdi:arrow-left-right"
+      },
+      "in_tight_range": {
+        "default": "mdi:bullseye"
+      },
+      "using_custom_ranges": {
+        "default": "mdi:tune-variant"
+      }
+    },
+    "sensor": {
+      "current_glucose": {
+        "default": "mdi:diabetes"
+      },
+      "status": {
+        "default": "mdi:list-status",
+        "state": {
+          "warm_up": "mdi:thermometer",
+          "expired": "mdi:timer-sand-empty",
+          "no_data": "mdi:database-off",
+          "no_current_data": "mdi:clock-alert-outline",
+          "expiring_soon": "mdi:timer-alert-outline"
+        }
+      },
+      "configuration": {
+        "default": "mdi:cog-outline"
+      },
+      "spoken_summary": {
+        "default": "mdi:account-voice"
+      },
+      "delta_5min": {
+        "default": "mdi:delta"
+      },
+      "last_reading": {
+        "default": "mdi:clock-check-outline"
+      },
+      "trend_arrow": {
+        "default": "mdi:arrow-right"
+      },
+      "active_source": {
+        "default": "mdi:database"
+      },
+      "data_maturity": {
+        "default": "mdi:progress-check"
+      },
+      "weekly_summary": {
+        "default": "mdi:chart-line-variant"
+      },
+      "change_over_time": {
+        "default": "mdi:chart-timeline-variant"
+      },
+      "sensor_expiry": {
+        "default": "mdi:timer-sand",
+        "state": {
+          "not_configured": "mdi:timer-off-outline",
+          "no_value": "mdi:help-circle-outline",
+          "unknown_format": "mdi:help-circle-outline",
+          "expiring_soon": "mdi:timer-alert-outline",
+          "expired": "mdi:timer-sand-empty"
+        }
+      },
+      "period_mean": {
+        "default": "mdi:chart-bar"
+      },
+      "period_std_dev": {
+        "default": "mdi:chart-scatter-plot"
+      },
+      "period_cv": {
+        "default": "mdi:percent"
+      },
+      "period_gmi": {
+        "default": "mdi:percent-circle"
+      },
+      "period_consensus": {
+        "default": "mdi:bullseye-arrow"
+      },
+      "period_custom": {
+        "default": "mdi:account-cog"
+      },
+      "period_tir": {
+        "default": "mdi:target"
+      },
+      "period_titr": {
+        "default": "mdi:bullseye"
+      },
+      "period_time_low": {
+        "default": "mdi:arrow-down-bold"
+      },
+      "period_time_high": {
+        "default": "mdi:arrow-up-bold"
+      },
+      "period_time_critical_low": {
+        "default": "mdi:alert"
+      },
+      "period_time_critical_high": {
+        "default": "mdi:alert-octagon"
+      },
+      "period_min": {
+        "default": "mdi:arrow-collapse-down"
+      },
+      "period_max": {
+        "default": "mdi:arrow-collapse-up"
+      },
+      "period_data_availability": {
+        "default": "mdi:clock-check"
+      },
+      "period_readings": {
+        "default": "mdi:counter"
+      },
+      "period_gri": {
+        "default": "mdi:gauge"
+      }
+    }
+  },
+  "services": {
+    "send_daily_summary": {
+      "service": "mdi:calendar-today"
+    },
+    "send_weekly_summary": {
+      "service": "mdi:calendar-range"
+    },
+    "send_monthly_summary": {
+      "service": "mdi:calendar-month"
+    },
+    "add_lab_a1c": {
+      "service": "mdi:test-tube"
+    },
+    "remove_lab_a1c": {
+      "service": "mdi:delete-outline"
+    },
+    "print_report": {
+      "service": "mdi:printer"
+    },
+    "export_csv": {
+      "service": "mdi:database-export"
+    },
+    "import_csv": {
+      "service": "mdi:database-import"
+    }
+  }
+}

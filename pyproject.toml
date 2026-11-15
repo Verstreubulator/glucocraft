@@ -1,0 +1,19 @@
+# Developer tool configuration only. GlucoCraft is installed as a Home Assistant custom integration (HACS), not as a
+# Python package, so this file has no [project] table. Tests are configured in pytest.ini.
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+# "tests" is on the test path (pytest.ini: pythonpath = tests), so ha_stub and the test helpers sort as first-party.
+src = [".", "tests"]
+
+[tool.ruff.lint]
+# The default rule set, plus import order (I), pyupgrade (UP), bugbear (B), no lambda assigned to a name (E731: a
+# small function with a docstring instead), no ambiguous one-letter variable names (E741), no blind `except Exception`
+# without a stated reason (BLE: each one carries `# noqa: BLE001 - <reason>`) and no `noqa` comment that suppresses
+# nothing (RUF100).
+extend-select = ["I", "UP", "B", "E731", "E741", "BLE", "RUF100"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests use `assert False` to fail on purpose (bugbear B011).
+"tests/**" = ["B011"]

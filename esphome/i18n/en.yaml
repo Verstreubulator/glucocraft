@@ -1,0 +1,277 @@
+# License: AGPL-3.0-only (LICENSE).
+# =====================================================================================================================
+# GlucoCraft panels: the text catalogue, English (the source language and the fallback for every missing key)
+# =====================================================================================================================
+# Every text a GlucoCraft panel shows lives here, under a key. A panel's language is a build choice: the substitution
+# "language: en" in the panel's configuration selects i18n/<language>.yaml.
+#
+# A new language: copy this file to i18n/<code>.yaml (the Home Assistant language code, for example de or pt-BR),
+# translate the values, keep the keys, then run
+#     python tools/make_panel_texts.py
+# which checks every catalogue and writes i18n/generated/<code>/ (the texts for the configurations and the firmware,
+# and the glyph lists of the fonts), and
+#     python tools/worst_case_fit.py <code>
+# which checks that every text fits on every panel layout. A key missing from a catalogue takes the English text.
+#
+# Format (the same as GlucoCraft's other catalogues):
+#   - flat, dotted, lower-case keys, by area (panel.<area>.<name>); one text per key, never assembled from fragments;
+#   - values are inserted through named placeholders such as {value} or {minutes}: keep every placeholder of the
+#     English text (the order may change); "\n" is a line break;
+#   - plural forms would be separate keys <key>.one / <key>.other; the panel texts need none (they use abbreviations
+#     such as "5 min" and "3d 2h");
+#   - numbers, dates and times keep GlucoCraft's regional settings (the decimal separator, the 12- or 24-hour clock,
+#     the date order); this file holds the words only;
+#   - not translated: proper names (GlucoCraft, Home Assistant, Wi-Fi, CGM), the license notice's names and address,
+#     and the citations ("Battelino 2019").
+#
+# GlucoCraft's disclaimer in its short form (panel.about.title and panel.about.disclaimer, together word for word as
+# GlucoCraft's const.py DISCLAIMER_SHORT; the long form is in the Documentation) and the disclaimer line of the
+# start-up screen (panel.startup.line, as const.py DISCLAIMER_LINE, with a line break between its two sentences: each
+# on a line of its own, centered) are the integration's texts; a translation translates them like every other text
+# and keeps the line break.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------- the start-up screen (with GlucoCraft's icon)
+panel.startup.name: "GlucoCraft"
+panel.startup.version: "Panel version {panel_version}"
+panel.startup.line: "For development and testing only.\nNot for medical use."
+
+# ---------------------------------------------------------------- the About page (page 16)
+# GlucoCraft's disclaimer in its short form, its first sentence as the title; then the version line and the
+# copyright line
+panel.about.title: "For development and testing only."
+panel.about.disclaimer: "GlucoCraft is free, open-source software, made available for development and testing. It is not intended for any medical purpose, such as diagnosing, monitoring or managing diabetes or making treatment decisions, and has not been cleared or approved by the FDA or any other regulator. Its information and notifications can be late, missing or wrong. Its notifications are not alarms. GlucoCraft is licensed under the AGPL-3.0-only, without warranty or, as far as the law allows, liability."
+panel.about.version: "GlucoCraft Panel v{panel_version}"
+# under the version: the copyright notice and where to read the license (AGPL-3.0-only, section 0, "Appropriate Legal
+# Notices"), the same words as on the display card (card.about.copyright), in two lines
+panel.about.copyright: "Copyright (C) 2026 The GlucoCraft authors.\nLicense: gnu.org/licenses/agpl-3.0"
+
+# ---------------------------------------------------------------- the clock header
+# the header's first texts after a start: no time and no date until a clock source has set the time (the same as
+# the clock's own first text, so no made-up time or date is shown, in any time or date format)
+panel.header.clock_initial: "--:--"
+panel.header.date_initial: ""
+# the header's date: the weekday above the day and month ({date}: "October 22" or "22 October", the date order)
+panel.header.date: "{weekday}\n{date}"
+
+# ---------------------------------------------------------------- days, months, the 12-hour clock
+panel.date.weekday.sunday: "Sunday"
+panel.date.weekday.monday: "Monday"
+panel.date.weekday.tuesday: "Tuesday"
+panel.date.weekday.wednesday: "Wednesday"
+panel.date.weekday.thursday: "Thursday"
+panel.date.weekday.friday: "Friday"
+panel.date.weekday.saturday: "Saturday"
+# on the 7-day graph's axis
+panel.date.weekday_short.sunday: "Sun"
+panel.date.weekday_short.monday: "Mon"
+panel.date.weekday_short.tuesday: "Tue"
+panel.date.weekday_short.wednesday: "Wed"
+panel.date.weekday_short.thursday: "Thu"
+panel.date.weekday_short.friday: "Fri"
+panel.date.weekday_short.saturday: "Sat"
+panel.date.month.january: "January"
+panel.date.month.february: "February"
+panel.date.month.march: "March"
+panel.date.month.april: "April"
+panel.date.month.may: "May"
+panel.date.month.june: "June"
+panel.date.month.july: "July"
+panel.date.month.august: "August"
+panel.date.month.september: "September"
+panel.date.month.october: "October"
+panel.date.month.november: "November"
+panel.date.month.december: "December"
+# in the time of the last reading and on the weekly graph's axis
+panel.date.month_short.january: "Jan"
+panel.date.month_short.february: "Feb"
+panel.date.month_short.march: "Mar"
+panel.date.month_short.april: "Apr"
+panel.date.month_short.may: "May"
+panel.date.month_short.june: "Jun"
+panel.date.month_short.july: "Jul"
+panel.date.month_short.august: "Aug"
+panel.date.month_short.september: "Sep"
+panel.date.month_short.october: "Oct"
+panel.date.month_short.november: "Nov"
+panel.date.month_short.december: "Dec"
+# the 12-hour clock ({time}: "7:46"); the 24-hour clock has no words
+panel.time.am: "{time} AM"
+panel.time.pm: "{time} PM"
+# an hour on a graph's time axis ({hour}: "6")
+panel.time.hour_am: "{hour}am"
+panel.time.hour_pm: "{hour}pm"
+
+# ---------------------------------------------------------------- the glucose block
+# a limit reading (outside the sensor's measurement range) instead of the number
+panel.value.lo: "LO"
+panel.value.hi: "HI"
+panel.glucose.trend_label: "TREND"
+panel.glucose.delta_label: "5 MIN DELTA"
+# The zone word under the value (GlucoCraft's display_word) and the trend word of the TREND column (the Trend arrow
+# attribute word, with the setting Trend shown as: word), in the words GlucoCraft sends. These must be the same words
+# as GlucoCraft's in this language (zone.word.* and trend.word.* of its backend catalogue). The panels only measure
+# them (worst_case_fit.py) and take their letters into the fonts.
+panel.word.zone.very_low: "Very low"
+panel.word.zone.low: "Low"
+panel.word.zone.in_range: "In range"
+panel.word.zone.tight_range: "Tight range"
+panel.word.zone.high: "High"
+panel.word.zone.very_high: "Very high"
+panel.word.zone.sensor_limit: "Sensor limit"
+panel.word.trend.changing_slowly: "Changing slowly"
+panel.word.trend.falling_quickly: "Falling quickly"
+panel.word.trend.rising_quickly: "Rising quickly"
+panel.word.trend.falling: "Falling"
+panel.word.trend.rising: "Rising"
+
+# ---------------------------------------------------------------- no current reading
+# in the glucose value's place, never a number: during a sensor warm-up; without current data after the sensor's
+# stated expiry (GlucoCraft does not monitor the sensor: only its stated expiry has passed); without current data
+# otherwise. The same words as the display card's (card.no_reading.*)
+panel.no_reading.warming_up: "Sensor warming up"
+panel.no_reading.sensor_expired: "Sensor expired"
+panel.no_reading.no_current_data: "No current data"
+# under the words, the last reading ({value} in the display unit, {unit} "mg/dL" or "mmol/L"; a limit reading as its
+# LO / HI, without a unit), then when it was taken: {time} "5:39 PM" or "17:39", {date} "Oct 22" or "22 Oct", in Home
+# Assistant's time zone; {ago} its age: minutes under an hour, hours and minutes under a day, then days and hours. The
+# larger layouts show when and the age on one line (time_ago); the square and 3.5-inch panels split it before the
+# bracket (the age on a line of its own: ago_line). The same texts as the display card's (card.no_reading.*)
+panel.no_reading.last_reading: "Last reading: {value} {unit}"
+panel.no_reading.last_reading_limit: "Last reading: {value}"
+panel.no_reading.when_today: "Today at {time}"
+panel.no_reading.when_yesterday: "Yesterday at {time}"
+panel.no_reading.when_date: "{date} at {time}"
+panel.no_reading.ago_minutes: "{minutes} min ago"
+panel.no_reading.ago_hours: "{hours} h {minutes} min ago"
+panel.no_reading.ago_days: "{days} d {hours} h ago"
+panel.no_reading.time_ago: "{when} ({ago})"
+panel.no_reading.ago_line: "({ago})"
+
+# ---------------------------------------------------------------- how long something has lasted
+# whole minutes, rounded down: "45 min", "2 h 5 min", from a day on days and hours "1 d 2 h" (the limit screen and the
+# screen without Home Assistant; the same forms as the display card's)
+panel.duration.minutes: "{minutes} min"
+panel.duration.hours: "{hours} h {minutes} min"
+panel.duration.days: "{days} d {hours} h"
+# since when ({time}: today "3:12 AM" or "03:12", yesterday panel.limit_screen.when_yesterday, earlier
+# panel.no_reading.when_date; {duration}: one of the three above)
+panel.since.line: "Since {time} ({duration})"
+
+# ---------------------------------------------------------------- the limit screen
+# while the current reading is a limit reading, in the value's place instead of a value, four lines: the zone (large,
+# in the zone color), the sensor range ({limit}: panel.value.lo / panel.value.hi), since when (panel.since.line) and
+# the newest measured reading before the stretch ({value} in the display unit, {unit}, {time} today's clock time;
+# on an earlier day last_measured_day with {when}: "yesterday at 3:10 AM" or "Oct 22 at 3:10 AM"); without a trusted
+# reading time the last line has no time. The same texts as the display card's (card.limit_screen.*)
+panel.limit_screen.low.title: "Very low"
+panel.limit_screen.high.title: "Very high"
+panel.limit_screen.low.range: "Below sensor range ({limit})"
+panel.limit_screen.high.range: "Above sensor range ({limit})"
+panel.limit_screen.last_measured: "Last measured: {value} {unit} at {time}"
+panel.limit_screen.last_measured_day: "Last measured: {value} {unit}, {when}"
+panel.limit_screen.last_measured_value: "Last measured: {value} {unit}"
+# a time on the day before, within a line ("Since yesterday at 3:12 AM (1 d 2 h)")
+panel.limit_screen.when_yesterday: "yesterday at {time}"
+
+# ---------------------------------------------------------------- the screen without Home Assistant
+# after an hour without the connection to Home Assistant or without a successful download of GlucoCraft's files,
+# below the clock and the date: the title, since when (panel.since.line), the last reading with its time ({value} in
+# the display unit, a limit reading as its LO / HI; without a trusted time panel.no_reading.last_reading), and what
+# to check
+panel.no_connection.title: "Cannot reach Home Assistant or load its data"
+panel.no_connection.last_reading: "Last reading: {value} {unit} at {time}"
+panel.no_connection.last_reading_limit: "Last reading: {value} at {time}"
+panel.no_connection.check: "Check Home Assistant and the wall-panel address"
+
+# ---------------------------------------------------------------- loading (the start)
+panel.loading.initializing: "Initializing..."
+panel.loading.downloading: "Downloading\nglucose data..."
+panel.loading.readings: "Loading glucose data..."
+panel.loading.graph_24h: "Loading 24-hour graph..."
+panel.loading.graph_7d: "Loading 7-day graph..."
+panel.loading.graph_14d: "Loading 14-day graph..."
+panel.loading.graph_30d: "Loading 30-day graph..."
+panel.loading.graph_90d: "Loading 90-day graph..."
+panel.loading.graph_180d: "Loading 6-month graph..."
+panel.loading.drawing: "Drawing graphs..."
+# the history file could not be downloaded at the start (the display card shows "Loading..." in its graphs instead)
+panel.loading.failed: "History not available\n\nShowing live data..."
+
+# ---------------------------------------------------------------- the status bar
+# the age of the newest reading: whole minutes up to 99, then whole hours (both rounded down; "min" and "h" have no
+# plural); "---" before any reading, and while the reading's time is more than 5 minutes ahead of the clock (its age
+# cannot be known)
+panel.status.reading_minutes: "Reading: {minutes} min ago"
+panel.status.reading_hours: "Reading: {hours} h ago"
+panel.status.reading_none: "Reading: ---"
+panel.status.warm_up: "Warm-up"
+panel.status.warm_up_minutes: "Warm-up: {minutes} min"
+panel.status.custom_ranges: "Custom ranges"
+# while a GlucoCraft notice is open in Home Assistant's Repairs: in the middle of the status bar, taking turns with the
+# warm-up text or "Custom ranges" (never the notice's own text)
+panel.status.check_home_assistant: "Check Home Assistant"
+panel.status.expiry_none: "Sensor Exp: ---"
+panel.status.expiry_minutes: "Sensor Exp: {minutes}m"
+panel.status.expiry_hours: "Sensor Exp: {hours}h {minutes}m"
+panel.status.expiry_days: "Sensor Exp: {days}d {hours}h"
+# after the stated expiry; it throbs until a new sensor is seen (the same fade as the words without a current reading,
+# with no 30-minute limit: it is small, and a new sensor can take a while), unless the fade setting is off
+panel.status.expired: "Sensor expiry passed"
+
+# ---------------------------------------------------------------- the graph pages
+panel.graph.title_6h: "6-Hour History"
+panel.graph.title_24h: "24-Hour History"
+panel.graph.title_7d: "7-Day History"
+panel.graph.title_14d: "14-Day History"
+panel.graph.title_30d: "30-Day History"
+panel.graph.title_90d: "90-Day History"
+panel.graph.title_180d: "6-Month History"
+# the key of the period graphs: "---" is the drawn sample of the area (the lowest to the highest reading of each time
+# slot) and of the line (the mean of the readings in each slot)
+panel.graph.legend_range: "--- Min to max"
+panel.graph.legend_average: "--- Mean"
+# the warning under a graph's title when its period has readings at the sensor's limit: "Sensor limit: LO 2 h 5 min"
+# the twelve statistics (labels above the values)
+panel.stat.tir: "TIR"
+panel.stat.titr: "TITR"
+panel.stat.low: "Low"
+panel.stat.high: "High"
+panel.stat.very_low: "Very low"
+panel.stat.very_high: "Very high"
+# "Avg", the mean glucose: "Mean" does not fit beside a two-digit mmol/L value in the square panel's 68 px cell
+panel.stat.mean: "Avg"
+panel.stat.sd: "SD"
+panel.stat.cv: "CV"
+panel.stat.min: "Min"
+panel.stat.max: "Max"
+# the GMI of the period it is computed from (at least 14 days)
+panel.stat.gmi_14d: "GMI14d"
+panel.stat.gmi_30d: "GMI30d"
+panel.stat.gmi_90d: "GMI90d"
+panel.stat.gmi_180d: "GMI180d"
+
+# ---------------------------------------------------------------- the weekly pages (the 14-day values at each week's end)
+# the title (the line under it, with the target or goal, comes from GlucoCraft's file in the display unit)
+panel.weekly.tir.title: "TIR % - 14-Day Values"
+panel.weekly.titr.title: "TITR % - 14-Day Values"
+panel.weekly.mean.title: "Mean Glucose - 14-Day Values"
+panel.weekly.cv.title: "CV % - 14-Day Values"
+panel.weekly.gmi.title: "GMI - 14-Day Values"
+panel.weekly.time_low.title: "Time Low - 14-Day Values"
+panel.weekly.time_high.title: "Time High - 14-Day Values"
+panel.weekly.sd.title: "SD - 14-Day Values"
+panel.weekly.min_max.title: "Min and Max - 14-Day Values"
+# the line under the description ({value}: "73%", "6.5%" or "48 mmol/mol"; {direction}: one of the three below)
+panel.weekly.status.value: "Last 14 days: {value}  {direction}"
+panel.weekly.status.glucose: "Last 14 days: {value} {unit}  {direction}"
+panel.weekly.status.min_max: "Min: {min}  Max: {max}  {direction}"
+panel.weekly.status.loading: "Loading..."
+panel.weekly.status.no_data: "No weekly data yet"
+# GlucoCraft's direction of the last 4 weeks against the 4 before
+panel.weekly.direction.increasing: "Increasing"
+panel.weekly.direction.decreasing: "Decreasing"
+panel.weekly.direction.stable: "Stable"
+# whose target colors the chart
+panel.weekly.target.consensus: "Consensus target"
+panel.weekly.target.custom: "Custom goal"

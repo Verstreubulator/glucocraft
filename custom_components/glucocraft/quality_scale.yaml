@@ -1,0 +1,153 @@
+# GlucoCraft's own record of Home Assistant's Integration Quality Scale rules
+# (https://contributors.home-assistant.io/core/quality-scale/rules/), in Home Assistant's format. hassfest validates
+# this file only for integrations in Home Assistant itself; for this custom integration it is a record, checked against
+# hassfest's schema by the tests. No tier is declared in manifest.json.
+rules:
+  # Bronze
+  action-setup: done
+  appropriate-polling:
+    status: exempt
+    comment: >-
+      GlucoCraft does not poll. It is event driven: it reacts to the state changes of its source entities. An
+      internal one-minute timer checks whether the data are current, and the statistics are recalculated every 5
+      minutes.
+  brands:
+    status: done
+    comment: >-
+      The integration ships its own brand folder (custom_components/glucocraft/brand: icon.png 256 x 256 and
+      icon@2x.png 512 x 512), which Home Assistant reads for a custom integration from version 2026.3.
+  common-modules: done
+  config-flow: done
+  config-flow-test-coverage:
+    status: todo
+    comment: >-
+      The setup flow and every Configure screen run on Home Assistant's own flow manager in tests_ha, but not every
+      path of config_flow.py does; the other paths are tested on a stand-in for Home Assistant (tests/ha_stub.py).
+  dependency-transparency:
+    status: todo
+    comment: >-
+      The one dependency, reportlab, is open source (BSD license) and published on PyPI. Whether its releases are
+      built and published by a public CI pipeline has not been established.
+  docs-actions: done
+  docs-conditions:
+    status: exempt
+    comment: GlucoCraft provides no conditions.
+  docs-high-level-description: done
+  docs-installation-instructions: done
+  docs-removal-instructions: done
+  docs-triggers:
+    status: exempt
+    comment: GlucoCraft provides no triggers.
+  entity-event-setup: done
+  entity-unique-id: done
+  has-entity-name:
+    status: done
+    comment: >-
+      Every entity sets has_entity_name and a translated name. Each entity also sets its entity id explicitly, the
+      same in every language, because the dashboard, the cards and the wall panels look for these exact ids.
+  runtime-data: done
+  test-before-configure: done
+  test-before-setup:
+    status: exempt
+    comment: >-
+      There is nothing to connect to. GlucoCraft reads entities of other integrations, and setup must succeed while a
+      source is missing, so that the stored readings stay available.
+  unique-config-entry: done
+
+  # Silver
+  action-exceptions: done
+  config-entry-unloading: done
+  docs-configuration-parameters: done
+  docs-installation-parameters: done
+  entity-unavailable:
+    status: exempt
+    comment: >-
+      The last reading stays shown with its own measurement time. The Status and No current data sensors report when
+      the data are not current, so no entity becomes unavailable for that reason.
+  integration-owner:
+    status: done
+    comment: >-
+      codeowners in manifest.json names the GitHub account of the repository's maintainer.
+  log-when-unavailable:
+    status: done
+    comment: >-
+      One warning when the source in use becomes unavailable or sends no reading for longer than the no-current-data
+      limit, and one info entry when it delivers current readings again; nothing is repeated while either lasts.
+  parallel-updates: done
+  reauthentication-flow:
+    status: exempt
+    comment: GlucoCraft uses no credentials.
+  test-coverage:
+    status: todo
+    comment: >-
+      Most tests run on a stand-in for Home Assistant (tests/ha_stub.py); the tests on Home Assistant itself
+      (tests_ha: setup and removal, the entities and their units, the Configure screens, the wall-panel address, the
+      display and report paths, the host behaviours, measurement times, phone messages) do not reach 95% for every
+      module.
+
+  # Gold
+  devices: done
+  diagnostics: done
+  discovery:
+    status: exempt
+    comment: There is nothing to discover. GlucoCraft reads entities that other integrations provide.
+  discovery-update-info:
+    status: exempt
+    comment: There is nothing to discover. GlucoCraft reads entities that other integrations provide.
+  docs-data-update: done
+  docs-examples:
+    status: exempt
+    comment: >-
+      GlucoCraft is made available for development and testing. Its documentation describes what its entities contain
+      and provides no automation examples.
+  docs-known-limitations: done
+  docs-supported-devices: done
+  docs-supported-functions: done
+  docs-troubleshooting: done
+  docs-use-cases:
+    status: exempt
+    comment: >-
+      GlucoCraft is made available for development and testing. Its documentation describes what it does, not use
+      cases.
+  dynamic-devices:
+    status: exempt
+    comment: GlucoCraft has one fixed device, created with the entry.
+  entity-category:
+    status: done
+    comment: >-
+      The technical entities are diagnostic: Configuration, Active source, Data history, Sensor expiry, Sensor warm-up
+      and, per period, the readings and sensor active sensors (these two exist only while Separate statistics entities
+      is on).
+      No entity that shows glucose information has a category.
+  entity-device-class: done
+  entity-disabled-by-default:
+    status: done
+    comment: >-
+      The Spoken summary and the binary sensors that no GlucoCraft page, card or panel reads are disabled by default.
+      The entities of the two optional features are created only while their setting is on.
+  entity-translations: done
+  exception-translations: done
+  icon-translations: done
+  reconfiguration-flow:
+    status: exempt
+    comment: >-
+      The Configure screens change every setting, the sources included, without removing the entry.
+  repair-issues: done
+  stale-devices:
+    status: exempt
+    comment: GlucoCraft has one fixed device, created with the entry and removed with it.
+
+  # Platinum
+  async-dependency:
+    status: exempt
+    comment: >-
+      GlucoCraft uses no library to communicate with a device or service. Its one dependency, reportlab, creates the
+      PDF of the CGM Report and runs in the executor.
+  inject-websession:
+    status: exempt
+    comment: >-
+      No dependency makes HTTP requests. The one request GlucoCraft makes itself, sending the CGM Report to a network
+      printer, uses the Python standard library in the executor.
+  strict-typing:
+    status: todo
+    comment: The code is not yet fully typed, and no strict mypy configuration exists.

@@ -1,0 +1,23 @@
+# HACS validation of the repository (https://hacs.xyz/docs/publish/action/): the checks HACS runs before a repository
+# can be added to the default store. No check is ignored.
+name: Validate
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  validate-hacs:
+    runs-on: "ubuntu-latest"
+    steps:
+      # The project's own validator, on its moving branch on purpose: it must check against HACS's current rules,
+      # which a pinned version would not follow.
+      - name: HACS validation
+        uses: "hacs/action@main"
+        with:
+          category: "integration"

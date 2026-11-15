@@ -1,0 +1,9 @@
+# Dependabot keeps the GitHub-owned actions of the workflows current: they are pinned to a commit (with the version
+# in a comment), and Dependabot proposes each new release as a pull request. The two project validators (hassfest and
+# the HACS action) run on their moving branches on purpose (see the workflows).
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: "https://github.com/Verstreubulator/glucocraft/discussions"
+    about: Questions, ideas and general discussion belong in Discussions.
+  - name: Security vulnerability
+    url: "https://github.com/Verstreubulator/glucocraft/security/advisories/new"
+    about: Report a vulnerability privately (SECURITY.md); never in a public issue.

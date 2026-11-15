@@ -1,0 +1,129 @@
+      # >>> About screen: a full screen with nothing else on it, so that the text can be larger, above the clock
+      # header, the glucose block and the status bar (the top layer's last child but the start-up screen), shown while
+      # page_about (current_page 16) is shown; it takes the touches then: swipe left = the 6-hour page, swipe right =
+      # the last weekly page. Texts: GlucoCraft's disclaimer in its short form (its first sentence as the title; the long form is in the
+      # Documentation), then the
+      # version line and the copyright line; no citations on the panels (the display card's About page shows the same
+      # texts). The wide layout (generated from tools/landscape_about.yaml): GlucoCraft's icon in a column of its own
+      # on the left, centered from top to bottom; in the column to its right the title and the disclaimer, centered
+      # in the room above the footer, and the footer at the bottom, centered in the same column: a thin line, the
+      # version line and the copyright line. Sizes per screen: make_glucocraft_landscape.py LAYOUTS (about_*).
+      - obj:
+          id: about_screen
+          hidden: true
+          x: 0
+          y: 0
+          width: 100%
+          height: 100%
+          styles: theme_background
+          bg_opa: COVER
+          border_width: 0
+          radius: 0
+          pad_top: @about_top@   # about top
+          pad_bottom: @about_bottom@   # about bottom
+          pad_left: @about_top@   # about side (= the top margin)
+          pad_right: @about_top@   # about side
+          scrollable: false
+          gesture_bubble: false   # so its own swipes below get the gesture (not the top layer)
+          layout:
+            type: flex
+            flex_flow: ROW
+            flex_align_main: START
+            flex_align_cross: CENTER
+            flex_align_track: CENTER
+            pad_column: @about_icon_gap@   # about icon gap
+          # the one navigation rule (nav_next / nav_prev handle page 16, and wait for the finger to lift)
+          on_swipe_left:
+            - script.execute: nav_next
+          on_swipe_right:
+            - script.execute: nav_prev
+          widgets:
+            - image:
+                src: about_icon_img
+                clickable: false
+            # the text column: the title and the disclaimer centered in the room above the footer, the footer below
+            - obj:
+                flex_grow: 1
+                height: 100%
+                bg_opa: TRANSP
+                border_width: 0
+                pad_all: 0
+                clickable: false
+                scrollable: false
+                layout:
+                  type: flex
+                  flex_flow: COLUMN
+                  flex_align_main: START
+                  flex_align_cross: CENTER
+                  flex_align_track: CENTER
+                  pad_row: 0
+                widgets:
+                  - obj:
+                      width: 100%
+                      flex_grow: 1
+                      bg_opa: TRANSP
+                      border_width: 0
+                      pad_all: 0
+                      clickable: false
+                      scrollable: false
+                      layout:
+                        type: flex
+                        flex_flow: COLUMN
+                        flex_align_main: CENTER
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                        pad_row: @about_gap@   # about gap
+                      widgets:
+                        - label:
+                            width: 100%
+                            text_font: @about_head_font@   # about heading font
+                            styles: theme_text
+                            text_align: CENTER
+                            long_mode: WRAP
+                            text: "${t_about_title}"
+                        - label:
+                            width: 100%
+                            text_font: @about_text_font@   # about text font
+                            styles: theme_text
+                            text_align: CENTER
+                            long_mode: WRAP
+                            text: "${t_about_disclaimer}"
+                  # the footer: a thin line in the frame color, the version line and the copyright line (two lines,
+                  # the catalogue's line break), in the version's font, centered in the text column
+                  - obj:
+                      width: 100%
+                      height: SIZE_CONTENT
+                      bg_opa: TRANSP
+                      border_width: 0
+                      pad_all: 0
+                      clickable: false
+                      scrollable: false
+                      layout:
+                        type: flex
+                        flex_flow: COLUMN
+                        flex_align_main: START
+                        flex_align_cross: CENTER
+                        flex_align_track: CENTER
+                        pad_row: 4   # about footer gap
+                      widgets:
+                        - obj:
+                            width: 40%
+                            height: 9   # about footer line: the line on top, 8 px to the version line
+                            styles: theme_box
+                            bg_opa: TRANSP
+                            border_width: 1
+                            border_side: TOP
+                            radius: 0
+                            pad_all: 0
+                            clickable: false
+                            scrollable: false
+                        - label:
+                            text_font: @about_ver_font@   # about version font
+                            styles: theme_text_label
+                            text: "${t_about_version}"
+                        - label:
+                            text_font: @about_ver_font@   # about version font
+                            styles: theme_text_label
+                            text_align: CENTER
+                            text: "${t_about_copyright}"
+      # <<< About screen

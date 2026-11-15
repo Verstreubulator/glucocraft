@@ -1,0 +1,20 @@
+# License: AGPL-3.0-only (LICENSE).
+# GlucoCraft starter: builds one example panel for your network and your Home Assistant (docs/PANELS.md).
+substitutions:              # your values; each value here replaces the board file's own
+  # ha_host: the IP address of the Home Assistant that runs GlucoCraft, not a .local name such as homeassistant.local,
+  # which the panel may not resolve (the example address below reaches nothing)
+  ha_host: "192.0.2.10"     # REPLACE: the IP address of the Home Assistant that runs GlucoCraft
+  ha_port: "8123"           # REPLACE if needed: Home Assistant's HTTP port (8123 unless it was changed)
+  # Optional: a local NTP time server (for example a router that serves NTP), used only by a panel that starts while
+  # Home Assistant is not connected. Without this line the panel uses the Home Assistant address: Home Assistant's
+  # time only, unless a time server answers there. Remove the # and set the server's IP address to use one:
+  # ntp_router: "192.0.2.1"
+  # Waveshare P4 7B only: "true" for an ESP32-P4 below chip revision v3.0 (the start-up log shows "chip revision:
+  # vX.Y"); the board file's default, "false", is for a production chip. Remove the # to set it:
+  # engineering_sample: "true"
+packages:                   # the board configuration this file builds, unchanged
+  panel: !include glucocraft-panel.yaml   # the 4-inch square panel; or another glucocraft-*.yaml of this folder
+# The Wi-Fi name and password, the panel's keys and the id of the wall-panel address are read from secrets.yaml in
+# this folder:
+# copy secrets.yaml.example to secrets.yaml and replace every value (secrets.yaml is yours; never publish it).
+# Build and flash: esphome run glucocraft-starter.yaml (the first time over USB, then over Wi-Fi).

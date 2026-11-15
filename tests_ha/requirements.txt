@@ -1,0 +1,8 @@
+# The tests on Home Assistant itself (tests_ha/), on the newest Home Assistant release tested: a virtual environment
+# of their own (Python 3.14), apart from requirements_test.txt (the stub suite must not see Home Assistant). Usage,
+# from the repository root, on Linux or macOS (Home Assistant does not run on Windows):
+#   python -m pip install -r tests_ha/requirements.txt
+#   python -m pytest tests_ha
+pytest-homeassistant-custom-component==0.13.375  # Home Assistant 2026.10.4 and its test harness
+home-assistant-frontend==20260930.5  # the frontend of that release (GlucoCraft depends on the frontend integration)
+reportlab==4.2.5  # GlucoCraft's own requirement (manifest.json)

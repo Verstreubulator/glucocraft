@@ -1,0 +1,12 @@
+# Test and lint dependencies (development only; Home Assistant installs the integration's own requirement,
+# reportlab, from manifest.json). Usage, from the repository root:
+#   python -m pip install -r requirements_test.txt
+#   python -m pytest
+#   ruff check .
+pytest==9.1.1
+PyYAML==6.0.3
+Jinja2==3.1.6
+pikepdf==10.17.0
+pypdf==6.21.4
+reportlab==4.2.5
+ruff==0.17.2

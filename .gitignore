@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets
+secrets.yaml
+
+# The example panel configurations: ESPHome's build folder, and the generated test language
+esphome/.esphome/
+esphome/i18n/pseudo.yaml
+esphome/i18n/generated/pseudo/
+
+# The test language "pseudo", generated from English by tools/i18n/make_pseudo.py: never committed, never released
+custom_components/glucocraft/i18n/pseudo/
