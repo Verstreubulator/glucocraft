@@ -161,6 +161,16 @@ def test_a_date_that_does_not_exist_is_refused():
     assert RS.lab_entry("2028-02-29", 7.0) == {"date": "2028-02-29", "a1c": 7.0}  # a leap day
 
 
+def test_a_date_later_than_today_is_refused():
+    """A blood test lies in the past: lab_entry refuses a date after today (the add action and the import pass today in
+    Home Assistant's time zone); today itself is accepted."""
+    from glucocraft import report_service as RS
+
+    with pytest.raises(ValueError, match="later than today"):
+        RS.lab_entry("2026-12-24", 6.4, today="2026-11-15")
+    assert RS.lab_entry("2026-11-15", 6.4, today="2026-11-15") == {"date": "2026-11-15", "a1c": 6.4}
+
+
 def test_unreadable_laboratory_rows_are_counted_and_the_notice_states_them():
     text = (
         "date,a1c_percent,a1c_mmol_mol,entered_unit\n2026-01-10,7.1,54,percent\n2026-01-11,abc,,percent\n\n2026-01-12\n"

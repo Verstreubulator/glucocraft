@@ -15,7 +15,7 @@
  * include_research_appendix; off by default), the same as the PDF (report_pdf.py). Every section has the PDF's layout:
  * a caption line with the rule and its source, the data, and Notes with the cited context that explains it.
  */
-const GCREPORT_VERSION = "0.0.1";
+const GCREPORT_VERSION = "0.0.2";
 // The language catalogues (glucocraft-i18n.js, served next to this file): every text comes from them, in Home
 // Assistant's language with English as the fallback. The card waits for gcI18nLoad before its first render.
 const GC_I18N_AREAS = ["frontend", "report"];
@@ -562,7 +562,11 @@ class GlucoCraftReport extends HTMLElement {
       if (action === "add_lab_a1c") this._lab = { date: "", a1c: "", unit, invalid: [] };   // saved: the entry is cleared
       await this.load();
     } catch (e) {
-      this._alert = gcT("report_page.status.lab_failed", { error: e.message || e });
+      // a result the action refuses (lab_invalid): its reason only, which Home Assistant passes as the error's
+      // translation placeholder; any other failure: Home Assistant's message
+      const invalid = e && e.translation_key === "lab_invalid" && e.translation_placeholders
+        && e.translation_placeholders.error;
+      this._alert = gcT("report_page.status.lab_failed", { error: invalid || (e && e.message) || e });
       this.draw();
     }
   }

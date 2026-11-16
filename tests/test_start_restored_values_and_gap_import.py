@@ -13,6 +13,9 @@ Rules under test:
   recorder's readings measured after its newest one at setup, read from shortly before that reading only, placed by
   their measurement times; no stored reading changes. A recorded state without its own measurement time is taken only
   when it cannot be a value written again as the entity came up.
+- A first history import (an empty store) applies the same rule: the copy of the last value that Home Assistant
+  writes as the source comes up at a start (same value and attributes, created afresh) is no reading; a value written
+  again with force_update (its last_changed kept) is one, and the first state of the history is one.
 """
 
 from __future__ import annotations
@@ -209,6 +212,33 @@ def test_the_first_state_read_without_its_own_time_is_not_imported(tmp_path, mon
     _recorder(monkeypatch, [_recorded(140, newest + 600), _recorded(145, newest + 900)])
     asyncio.run(c.async_setup())
     assert [(r.timestamp, r.raw) for r in c.storage.readings[len(before) :]] == [(newest + 900, 145.0)]
+
+
+def test_a_first_import_leaves_out_the_copy_written_at_a_start(tmp_path, monkeypatch):
+    """An empty store: the whole history is imported, without the value written again as Home Assistant started."""
+    now = (int(time.time()) // 300) * 300
+    t0 = now - 4 * 3600
+    c = _coordinator(tmp_path, state("140"))
+    original = _recorded(131, t0 + 600)
+    forced = _recorded(131, t0 + 900)
+    forced.last_changed = original.last_changed  # written again with force_update: the state did not change
+    recorded = [
+        _recorded(100, t0),  # the first state of the history
+        _recorded(110, t0 + 300),
+        original,
+        forced,
+        _recorded(131, t0 + 3600),  # written again as Home Assistant started: created afresh, no reading
+        _recorded(140, t0 + 3900),
+    ]
+    _recorder(monkeypatch, recorded)
+    asyncio.run(c.async_setup())
+    assert [(r.timestamp, r.raw) for r in c.storage.readings] == [
+        (t0, 100.0),
+        (t0 + 300, 110.0),
+        (t0 + 600, 131.0),
+        (t0 + 900, 131.0),
+        (t0 + 3900, 140.0),
+    ]
 
 
 def test_no_gap_import_while_the_clock_is_behind_or_without_a_recorder(tmp_path, monkeypatch):

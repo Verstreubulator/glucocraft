@@ -70,8 +70,9 @@ async def async_import_history(
     the same, because Home Assistant recorded the states of that time at the clock's wrong time. With `after` and
     `recent_only` (the setup's import of the readings after the newest stored one, coordinator.async_setup), the
     recorder is read only from shortly before `after` (_RECENT_CONTEXT_SECONDS; at the earliest from the retention's
-    first day) to now: those states were recorded at the right time. A state without its own measurement time is then
-    taken only when it cannot be a value written again as the entity came up (rows_from_states, `before`). The rows are
+    first day) to now: those states were recorded at the right time. In every import a state without its own
+    measurement time is taken only when it cannot be a value written again as the entity came up at a start of Home
+    Assistant (rows_from_states, `before`; _came_up_again). The rows are
     stored and saved under the coordinator's `lock`. Each state is decided as a live one: `limits` are the source's
     resolved limits (coordinator._source_limits: lower, upper, lower_setting, upper_setting, dexcom_type, nightscout;
     limits.classify gives LO / HI at the limit, a reading at a lower limit set by hand LO and at an upper limit set by
@@ -113,8 +114,9 @@ async def async_import_history(
         return await get_instance(hass).async_add_executor_job(_get_history, hass, entity_id, utc(start), utc(end))
 
     no_time = [0]  # the states whose time attribute held no usable time (rows_from_states)
-    # the recent-only import: the usable state recorded before the part being parsed, carried from part to part
-    before: list[Any] | None = [None, False] if recent else None
+    # the usable state recorded before the part being parsed, carried from part to part (rows_from_states): the
+    # recent-only import does not know what came before its first state, a whole history starts with its first
+    before: list[Any] = [None if recent else HISTORY_START, False]
 
     def to_rows(states: list[Any], newest: int | None) -> list[Row]:
         """The recorded states as rows, decided as live readings (rows_from_states)."""
@@ -316,16 +318,31 @@ def _measured(state: Any, time_attribute: str, parse_time: TimeParser | None, af
     return int(state.last_updated.timestamp()), unusable
 
 
+# rows_from_states `before`: the first state of a whole history, which has no earlier state to be compared with
+HISTORY_START = object()
+
+
 def _came_up_again(
     state: Any, previous: Any, went_away: bool, time_attribute: str, parse_time: TimeParser | None, after: int | None
 ) -> bool:
     """Return True for a recorded state without its own measurement time that may be a value written again as the
-    entity came up, not a measurement (rows_from_states, `before`); a state with its own time is decided by it."""
+    entity came up, not a measurement (rows_from_states, `before`); a state with its own time is decided by it.
+
+    previous None (the recent-only import's first state: what came before it is not known) counts as came up;
+    HISTORY_START (the first state of a whole history) does not. A state with the value of the one before it came up
+    again after an unavailable or unknown state, and also with that state's attributes when it was created afresh (its
+    last_changed differs from the state before it): Home Assistant records no row for a value written again unchanged,
+    so such a row was written as the entity came up at a start of Home Assistant. A value written again with
+    force_update keeps its last_changed and is a reading, as on the live path (coordinator._async_state_changed)."""
     if attribute_time(state.attributes, time_attribute, parse_time or _epoch, after)[0] is not None:
         return False
     if previous is None:
         return True
-    return state.state == previous.state and (went_away or dict(state.attributes) == dict(previous.attributes))
+    if previous is HISTORY_START or state.state != previous.state:
+        return False
+    if went_away:
+        return True
+    return dict(state.attributes) == dict(previous.attributes) and state.last_changed != previous.last_changed
 
 
 def rows_from_states(
@@ -350,13 +367,11 @@ def rows_from_states(
     repeated hour of a daylight-saving fall-back then gets its second occurrence once the first has passed.
     no_time: a one-element counter of the states whose time attribute held no usable time (their recording time is
     used).
-    before: for the recent-only import (async_import_history), [the usable state recorded before these states (None:
-    not known), whether an unavailable or unknown state came after it], carried from one call to the next. A state
-    without its own measurement time is then left out where the live path leaves it out as a value that came up
-    again, not a measurement (coordinator._async_state_changed): when the state before it is not known, when it has
-    the value of the state before it after an unavailable or unknown state, and when it has that state's value and
-    attributes (Home Assistant records no row for a value written again unchanged, so such a row is one written as the
-    entity came up at a start of Home Assistant)."""
+    before: [the usable state recorded before these states (None: not known, the recent-only import's start;
+    HISTORY_START: the start of a whole history), whether an unavailable or unknown state came after it], carried from
+    one call to the next (async_import_history passes it for every import). A state without its own measurement time
+    is then left out where the live path leaves it out as a value that came up again, not a measurement
+    (coordinator._async_state_changed; _came_up_again)."""
     by_time: dict[int, Row] = {}
     for state in states:
         if state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN, ""):

@@ -284,7 +284,7 @@
   "report_page.output.title": "PDF and Printing",
   "report_page.picker.description": "GlucoCraft CGM Report: 14-day summary, longer-term overview, PDF and printing, laboratory A1C",
   "report_page.picker.name": "GlucoCraft CGM Report",
-  "report_page.status.lab_failed": "Laboratory result not saved ({error}).",
+  "report_page.status.lab_failed": "Laboratory result not saved: {error}",
   "report_page.status.lab_remove_confirm": "Remove the laboratory result of {date}?",
   "report_page.status.load_failed": "The report could not be loaded ({error}).",
   "report_page.status.loading": "Loading the report…",

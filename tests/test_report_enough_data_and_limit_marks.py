@@ -319,6 +319,28 @@ def test_the_page_shows_the_refusal_text():
     assert out == [refusal, 60]
 
 
+@needs_node
+def test_a_refused_laboratory_result_shows_its_reason_once():
+    """The action refuses a result (lab_invalid): the page states the reason only, which Home Assistant passes as the
+    error's translation placeholder; any other failure keeps Home Assistant's message."""
+    reason = "The date must not be later than today."
+    out = page_eval(
+        "const card = new (customElements.get('glucocraft-report'))(); card.setConfig({});"
+        "card.load = async () => {}; card.draw = () => {}; const alerts = [];"
+        "for (const err of ["
+        f"{{ translation_key: 'lab_invalid', translation_placeholders: {{ error: {json.dumps(reason)} }},"
+        f" message: 'The laboratory A1C result was not stored: ' + {json.dumps(reason)} }},"
+        "{ translation_key: 'lab_add_failed', message: 'The laboratory A1C result could not be stored' }]) {"
+        "card._hass = { states: {}, callService: async () => { throw err; } };"
+        "await card.lab('add_lab_a1c', '2026-12-24', 6.4, 'percent'); alerts.push(card._alert); }"
+        "return alerts;"
+    )
+    assert out == [
+        "Laboratory result not saved: The date must not be later than today.",
+        "Laboratory result not saved: The laboratory A1C result could not be stored",
+    ]
+
+
 # ------------------------------------------------------------------------------------------------ smaller rules
 def test_mmol_axis_labels_in_one_format(monkeypatch):
     d = with_page_keys(R.build_report([], 300, LA, 14, False, [], now=NOW), 14, "mmol/L")

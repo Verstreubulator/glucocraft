@@ -199,6 +199,7 @@
   "report.lab.col.gmi": "GMI (90 days)",
   "report.lab.difference_both": "In the Difference column, the first value is in percentage points and the second in mmol/mol. In mmol/mol, the GMI follows the GMI equation (Bergenstal et al., 2018) and a laboratory A1C entered in percent the master equation (Hoelzel et al., 2004), so two values equal in percent can differ by 1 mmol/mol.",
   "report.lab.error.date": "The date must be a calendar date written as year-month-day, for example 2026-10-22.",
+  "report.lab.error.future": "The date must not be later than today.",
   "report.lab.error.no_date": "Enter the date of the blood test.",
   "report.lab.error.range": "The A1C must be between {low} and {high} {unit}.",
   "report.lab.error.unit": "The unit must be percent or mmol/mol.",

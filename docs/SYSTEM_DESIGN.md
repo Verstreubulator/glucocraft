@@ -718,11 +718,14 @@ reader that took the field as a signed 32-bit number would end in January 2038 (
   the primary measured after the newest stored one, under the same conditions (`_import_primary_history(newest,
   recent_only=True)`, placed by `storage.fill_after`, as the catch-up after a clock that was behind): the recorder is
   read only from an hour before the newest stored reading (`history_import._RECENT_CONTEXT_SECONDS`, at the earliest
-  the retention's first day). In this import a recorded state without its own measurement time is skipped when it may
-  be a value written again as the entity came up (`history_import._came_up_again`): when the state before it is not
-  known, when it has the value of the state before it after an unavailable / unknown state, or when it has that
-  state's value and attributes (the recorder writes no row for an unchanged write, so such a row is a restore at a
-  start). While Home Assistant is not running, the recorder records nothing, so that time remains a gap.
+  the retention's first day). In every import (the first one too) a recorded state without its own measurement time
+  is skipped when it may be a value written again as the entity came up (`history_import._came_up_again`): when the
+  state before it is not known (the recent-only import's first state; the first state of a whole history is taken),
+  when it has the value of the state before it after an unavailable / unknown state, or when it has that state's
+  value and attributes and was created afresh, its `last_changed` differing (the recorder writes no row for an
+  unchanged write, so such a row is a restore at a start; a value written again with `force_update` keeps its
+  `last_changed` and is a reading, as on the live path). While Home Assistant is not running, the recorder records
+  nothing, so that time remains a gap.
 - **Removal:** as the setting *When GlucoCraft is deleted* says (`__init__.async_remove_entry`). *Delete everything*:
   deleting the integration removes the readings file and its copies, the CSV exports, the report PDFs, the empty
   folders, every store, every Repairs issue and notification, the recorded states and long-term statistics of its

@@ -118,13 +118,15 @@ def custom_settings(cfg: dict) -> dict:
     return {"ranges": dict(cfg.get("ranges") or {}), "goals": dict(cfg.get("goals") or {})}
 
 
-def lab_entry(date: str, value: float, unit: str = "percent") -> dict:
+def lab_entry(date: str, value: float, unit: str = "percent", today: str | None = None) -> dict:
     """Return one laboratory result as stored; raise ValueError, with the refusal as its text, for a date, unit or
     value that is not valid.
 
     a1c in percent (one decimal; two when converted from mmol/mol, so that the value entered is reproduced), and
     a1c_mmol_mol when it was entered in mmol/mol. The date is a real calendar date written YYYY-MM-DD (a date that
-    does not exist, such as February 30, is refused).
+    does not exist, such as February 30, is refused) and, given today (YYYY-MM-DD in Home Assistant's time zone), not
+    later than today: a blood test lies in the past, and the report's window around a later date would reach into
+    days without data.
     """
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):  # the shape first: strptime alone accepts "2026-1-5"
         raise ValueError(t("report.lab.error.date"))
@@ -132,6 +134,8 @@ def lab_entry(date: str, value: float, unit: str = "percent") -> dict:
         datetime.strptime(date, "%Y-%m-%d")
     except ValueError:
         raise ValueError(t("report.lab.error.date")) from None
+    if today is not None and date > today:  # both YYYY-MM-DD: the text order is the date order
+        raise ValueError(t("report.lab.error.future"))
     if unit not in LAB_LIMITS:
         raise ValueError(t("report.lab.error.unit"))
     lo, hi = LAB_LIMITS[unit]
@@ -473,7 +477,7 @@ class GlucoCraftReports:
     # ------------------------------------------------------------------ laboratory A1C
     async def async_add_lab(self, date: str, a1c: float, unit: str = "percent") -> None:
         """Add or replace the laboratory A1C result of a date (percent or mmol/mol)."""
-        entry = lab_entry(date, a1c, unit)
+        entry = lab_entry(date, a1c, unit, today=dt_util.now().date().isoformat())
         self._lab = [r for r in self._lab if r.get("date") != date] + [entry]
         self._lab.sort(key=lambda r: r["date"])
         await self._store.async_save({"results": self._lab})
@@ -482,17 +486,18 @@ class GlucoCraftReports:
     async def async_import_lab(self, results: list[tuple[str, float, str]], not_read: int = 0) -> dict[str, int]:
         """Add imported laboratory results (date, value, unit) whose date has no stored result, and return the counts
         the import states: {"lab_imported", "lab_already_stored", "lab_not_read"}. A stored result is kept as it is
-        (lab_already_stored); a result that lab_entry refuses (an impossible date, a value outside LAB_LIMITS) is left
-        out and counted with the rows the file reader could not read (not_read: export.read_lab_csv) in
+        (lab_already_stored); a result that lab_entry refuses (an impossible or future date, a value outside LAB_LIMITS)
+        is left out and counted with the rows the file reader could not read (not_read: export.read_lab_csv) in
         lab_not_read."""
         dates = {r.get("date") for r in self._lab}
+        today = dt_util.now().date().isoformat()
         added, already_stored, refused = [], 0, 0
         for date, value, unit in results:
             if date in dates:
                 already_stored += 1
                 continue
             try:
-                added.append(lab_entry(date, value, unit))
+                added.append(lab_entry(date, value, unit, today=today))
             except ValueError:
                 refused += 1
                 continue

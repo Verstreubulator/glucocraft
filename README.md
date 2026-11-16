@@ -16,7 +16,7 @@ GlucoCraft is a Home Assistant custom integration designed to calculate and disp
 data provided by other integrations (statistics as defined in the published international consensus, a dashboard, a CGM
 Report with PDF (Portable Document Format) and printing, summary notifications, and data files for ESP32 wall panels).
 
-**Status:** pre-release (integration version 0.0.1). Not in the default catalog of Home Assistant's Marketplace
+**Status:** pre-release (integration version 0.0.2). Not in the default catalog of Home Assistant's Marketplace
 or of HACS: install it as a custom repository ([Installation](#installation)).
 
 ## Sources not supported for live display
@@ -181,12 +181,12 @@ entities and folders of the installation; read it and remove names before sharin
 
 | Part | Version | Where it is set |
 |---|---|---|
-| Integration | 0.0.1 | `custom_components/glucocraft/manifest.json` (also the device version) |
+| Integration | 0.0.2 | `custom_components/glucocraft/manifest.json` (also the device version) |
 | Dashboard strategy | 0.0.1 | `www/glucocraft-strategy.js` |
 | Dashboard cards | 0.0.1 | `www/glucocraft-ui.js` |
 | Display card | 0.0.1 | `www/glucocraft-display-card.js` |
 | Documentation page | 0.0.1 | `www/glucocraft-docs.js` |
-| Report page | 0.0.1 | `www/glucocraft-report.js` |
+| Report page | 0.0.2 | `www/glucocraft-report.js` |
 | Language module | 0.0.1 | `www/glucocraft-i18n.js` |
 | Shared module | 0.0.1 | `www/glucocraft-shared.js` |
 | Wall panel configurations | 0.0.1 | `panel_version` in each example panel configuration |
