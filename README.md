@@ -16,7 +16,7 @@ GlucoCraft is a Home Assistant custom integration designed to calculate and disp
 data provided by other integrations (statistics as defined in the published international consensus, a dashboard, a CGM
 Report with PDF (Portable Document Format) and printing, summary notifications, and data files for ESP32 wall panels).
 
-**Status:** pre-release (integration version 0.0.2). Not in the default catalog of Home Assistant's Marketplace
+**Status:** pre-release (integration version 0.0.3). Not in the default catalog of Home Assistant's Marketplace
 or of HACS: install it as a custom repository ([Installation](#installation)).
 
 ## Sources not supported for live display
@@ -117,7 +117,12 @@ Documentation page of its dashboard describes each step in full (*Installing, Up
    (the menu (three dots) > **Custom repositories**), then open GlucoCraft in HACS and select
    **Download**; or copy the folder `custom_components/glucocraft/` into the
    `custom_components/` folder of the configuration directory.
-2. **Set it up:** restart Home Assistant, select **Settings > Devices & services > Add integration > GlucoCraft**, read
+
+   On Home Assistant 2026.11 and later, this button opens GlucoCraft in the Marketplace of your own Home Assistant:
+
+   [![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Verstreubulator&repository=glucocraft&category=integration)
+2. **Set it up:** restart Home Assistant (not needed after an installation through the Marketplace), select
+   **Settings > Devices & services > Add integration > GlucoCraft**, read
    the disclaimer on the first screen and follow the setup steps; the Documentation page of the GlucoCraft dashboard
    explains everything in detail.
 3. **Update** it from the update entity of the Marketplace or HACS under **Settings > Updates** (by hand: copy the
@@ -181,7 +186,7 @@ entities and folders of the installation; read it and remove names before sharin
 
 | Part | Version | Where it is set |
 |---|---|---|
-| Integration | 0.0.2 | `custom_components/glucocraft/manifest.json` (also the device version) |
+| Integration | 0.0.3 | `custom_components/glucocraft/manifest.json` (also the device version) |
 | Dashboard strategy | 0.0.1 | `www/glucocraft-strategy.js` |
 | Dashboard cards | 0.0.1 | `www/glucocraft-ui.js` |
 | Display card | 0.0.1 | `www/glucocraft-display-card.js` |

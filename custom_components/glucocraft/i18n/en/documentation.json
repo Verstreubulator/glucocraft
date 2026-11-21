@@ -387,7 +387,7 @@
   ],
   "docs.section.install.title": "Installing, Updating and Removing GlucoCraft",
   "docs.section.install.body": [
-    "<p>GlucoCraft is not in the default catalog of Home Assistant's Marketplace or of HACS: it is installed from its repository, <a href=\"https://github.com/Verstreubulator/glucocraft\" target=\"_blank\" rel=\"noopener\">https://github.com/Verstreubulator/glucocraft</a>, as a custom repository, or by hand. Each way ends with a restart of Home Assistant and the setup (Settings > Devices &amp; services > <i>Add integration</i> > GlucoCraft; see {sec:setup|Setup}).</p>",
+    "<p>GlucoCraft is not in the default catalog of Home Assistant's Marketplace or of HACS: it is installed from its repository, <a href=\"https://github.com/Verstreubulator/glucocraft\" target=\"_blank\" rel=\"noopener\">https://github.com/Verstreubulator/glucocraft</a>, as a custom repository, or by hand. Each way ends with the setup (Settings > Devices &amp; services > <i>Add integration</i> > GlucoCraft; see {sec:setup|Setup}), after a restart of Home Assistant for an installation through HACS or by hand; an installation through the Marketplace needs no restart.</p>",
     "<h3>Installing</h3>",
     "<ul>",
     "<li><b>Home Assistant 2026.11 and later: the Marketplace.</b> In Settings > <i>Marketplace</i>, the repository's address is added as a custom repository with the category <i>Integration</i>, and GlucoCraft is installed. The Marketplace asks for a connection to GitHub for a custom repository and checks the repository before it installs it. An installation made with HACS before the update to 2026.11 is taken over by the Marketplace, with its custom repositories.</li>",
