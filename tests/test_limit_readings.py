@@ -21,6 +21,7 @@ import re
 import struct
 import types
 from datetime import UTC, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
 import yaml
@@ -30,6 +31,7 @@ from glucocraft import statistics as S
 from glucocraft.const import STAT_PERIODS
 from glucocraft.storage import GlucoseReading
 
+import ha_stub
 from conftest import NO_PANELS, PANELS, REPO, real_coordinator
 from node_runner import needs_node
 from test_accessibility import _card
@@ -355,12 +357,19 @@ def test_the_card_shows_the_lo_screen_and_never_no_current_data():
     assert ">LO</text>" not in out["svg"] and 'fill="#c62828"' in out["svg"]
 
 
+def _clock_at(hour: int, minute: int) -> None:
+    """Set the test's clock (and node's) to Wednesday 21 October 2026 at hour:minute in Los Angeles."""
+    ha_stub.set_clock(datetime(2026, 10, 21, hour, minute, tzinfo=ZoneInfo("America/Los_Angeles")).timestamp())
+
+
 # The attributes of a stretch of limit readings (limit_since, last_measured_mgdl, last_measured_ts), the stretch begun
-# 2 h 5 min ago, the last measured reading 2 minutes before it
+# 2 h 5 min ago, the last measured reading 2 minutes before it; Home Assistant's time zone set, so that "today" and
+# "yesterday" depend only on the test's clock (_clock_at)
 _STRETCH = """
   const cur = states["sensor.glucocraft_last_glucose_reading"].attributes, now = Math.floor(Date.now() / 1000);
   Object.assign(cur, {{ limit_since: now - 125 * 60, last_measured_mgdl: {mg}, last_measured_ts: now - 127 * 60 }});
-  card.hass = {{ states, fetchWithAuth: async () => ({{ ok: false }}) }}; card._render();
+  card.hass = {{ states, config: {{ time_zone: "America/Los_Angeles" }}, fetchWithAuth: async () => ({{ ok: false }}) }};
+  card._render();
   return {{ svg: root.querySelector("svg").innerHTML, label: root.querySelector("svg").attrs["aria-label"] }};
 """
 
@@ -379,7 +388,9 @@ _STRETCH = """
 def test_the_lo_hi_screen_four_lines(tag, compact, limit, zone, word, line, mg, unit, shown):
     """The value's place at the sensor's limit, modeled on the words without a current reading: the zone word, large
     and in the zone's color; "Below sensor range (LO)" / "Above sensor range (HI)"; since when, with how long; the last
-    measured value before the stretch with its time. The trend stays blank, the 5-minute delta "---"."""
+    measured value before the stretch with its time. The trend stays blank, the 5-minute delta "---". At noon, so the
+    stretch began today whenever the suite runs."""
+    _clock_at(12, 0)
     out = _card(
         tag,
         value=40 if limit == "low" else 400,
@@ -398,12 +409,27 @@ def test_the_lo_hi_screen_four_lines(tag, compact, limit, zone, word, line, mg, 
     assert line in joined and not re.search(
         r'font-size="(120|160|\d{2,3})" fill="#[0-9a-f]{6}"[^>]*>40{1,2}</text>', out["svg"]
     )
-    assert re.search(r"Since \d{1,2}:\d\d( AM| PM)? \(2 h 5 min\)", joined), texts
+    assert "Since 9:55 AM (2 h 5 min)" in joined, texts
     assert re.search(rf"Last measured: {re.escape(shown)}( at|,) ", joined) or f"Last measured: {shown}" in joined
     assert "M4,11V13H16" not in out["svg"]  # no trend arrow
     said = out["label"]
     assert said.startswith(f"Glucose {'below' if limit == 'low' else 'above'} the sensor's")
     assert ", for 2 hours 5 minutes." in said and "Last measured " in said
+
+
+@needs_node
+@pytest.mark.parametrize("tag", ["glucocraft-display-card", "glucocraft-display-card-wide"])
+def test_the_lo_hi_screen_names_yesterday_after_midnight(tag):
+    """The same stretch of 2 h 5 min seen at 1:06 AM began the day before: "yesterday at" its clock time, on the
+    screen and in the text description (a line too long for the room wraps; joined again here)."""
+    _clock_at(1, 6)
+    out = _card(
+        tag, value=40, zone="very_low", label="Very low", limit="low", unit="mg/dL", extra=_STRETCH.format(mg=52)
+    )["extra"]
+    joined = " ".join(re.findall(r"<text[^>]*>([^<]*)</text>", out["svg"]))
+    assert "Since yesterday at 11:01 PM (2 h 5 min)" in joined, joined
+    assert "yesterday at 10:59 PM" in joined.split("Last measured", 1)[1], joined
+    assert "Since yesterday at 11:01 PM, for 2 hours 5 minutes." in out["label"]
 
 
 @needs_node

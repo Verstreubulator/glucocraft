@@ -72,8 +72,12 @@ file). The Waveshare P4 7B also has *Wi-Fi Co-processor Firmware*, the firmware 
 [Waveshare P4 7B: start-up and updates](#waveshare-p4-7b-start-up-and-updates)). The configurations also contain
 the Safe Mode button of ESPHome, marked internal, so Home Assistant does not show it.
 
-**Board notes** (from the configurations):
+**Board notes** (from the configurations and the boards):
 
+- **Square 480 × 480 panel:** its USB socket reaches the chip through a USB-to-serial chip (CH340), while ESPHome
+  writes the panel's log to the ESP32-S3's own USB, which this board does not connect to the socket: over the cable,
+  the panel shows only the start-up lines of its chip. Flashing and restarting over the cable work; the panel's log is
+  read over Wi-Fi (*Logs* in the ESPHome Device Builder, or `esphome logs`).
 - **Waveshare 5-inch LCD and Waveshare 7-inch LCD:** the backlight can only be switched on and off (no dimming).
 - **3.5-inch panel:** the landscape picture is made by rotating the drawing in software (an ESPHome feature since
   2026.5, within the minimum version below).
@@ -398,7 +402,13 @@ Home Assistant (the example configurations connect over Wi-Fi), and GlucoCraft i
      computer, or download the firmware and flash it with the web flasher of ESPHome; after that, **Install** updates the
      panel over Wi-Fi.
 7. **Add the device in Home Assistant.** Select **Settings > Devices & services > ESPHome** and add the new device
-   with its API key from step 3.
+   with its API key from step 3. When the ESPHome Device Builder app runs in the same Home Assistant, Home Assistant
+   takes the key from the Device Builder and does not ask for it.
+
+**Panels of different types.** Each board configuration has its own device name and secrets. Copy the starter file
+once for each board (for example `glucocraft-starter-waveshare-lcd7.yaml`), set the package line of each copy to its
+board's configuration (step 5), and build and add each copy as in steps 6 and 7; `ha_host` and `ha_port` are the same
+in every copy, and `engineering_sample` is set in the copy for the Waveshare P4 7B only.
 
 **A second panel of the same type.** Each panel needs its own device name, API key and access-point password. In
 every board configuration, the device name and the friendly name are in the `esphome:` block, the access-point name is
@@ -502,6 +512,13 @@ until each panel has been built and installed again with the new id.
   the panel: Home Assistant's sign-in page (or its dashboard) means that the address and the port are right.
 - **A panel shows an old version.** *Cause:* updating GlucoCraft does not change a panel's firmware. *Check:* the
   version on the About page; build and install the updated example configuration.
+- **A board connects and disconnects over and over before its first flash.** *Symptom:* connected to the computer by
+  USB, the board appears and disappears every few seconds (on Windows, the device sound repeats). *Cause:* its flash
+  memory is empty (for example after `esptool erase-flash`), so its chip restarts every few seconds; on the boards
+  whose USB socket is the chip's own (the 3.5-inch panel and the Waveshare 5-inch LCD), each restart also restarts the
+  USB connection. Nothing is wrong. *Check:* flash the board (step 6); the repetition ends with the first flash. If
+  the flashing tool cannot open the port between two restarts, hold the board's BOOT button while connecting it: the
+  board then waits in download mode until it is flashed.
 - **History not available.** *Symptom:* the graphs and weekly pages of a wall panel show *Loading...*, as the display card's do,
   until a download works; at its start the panel may show *History not available* (with *Showing live data...*)
   for a second, often hidden by the start-up screen.

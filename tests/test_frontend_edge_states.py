@@ -20,10 +20,14 @@ mistyped card options, a redraw of the Documentation, and the rules the card fil
 from __future__ import annotations
 
 import json
+import re
 import textwrap
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
 
+import ha_stub
 from js_i18n import WWW, catalogue, i18n_prelude
 from node_runner import needs_node, node_json
 from test_accessibility import FAKE_DOM, _card
@@ -77,14 +81,23 @@ def test_the_statistics_card_shows_no_time_ahead_of_the_clock():
     assert '<div class="nc" aria-hidden="true">No current data since ' in out
 
 
-# the stretch of limit readings: its start and the last measured reading (seconds before now), and time_untrusted
+# the stretch of limit readings: its start and the last measured reading (seconds before now), and time_untrusted;
+# Home Assistant's time zone set, so that "today" and "yesterday" depend only on the test's clock (_at)
 _LIMIT = """
   const cur = states["sensor.glucocraft_last_glucose_reading"].attributes, now = Math.floor(Date.now() / 1000);
   Object.assign(cur, {{ limit_since: now - {since}, last_measured_mgdl: 52, last_measured_ts: now - {measured} }});
   Object.assign(states["sensor.glucocraft_last_reading_time"].attributes, {{ time_untrusted: {untrusted} }});
-  card.hass = {{ states, fetchWithAuth: async () => ({{ ok: false }}) }}; card._render();
+  card.hass = {{ states, config: {{ time_zone: "America/Los_Angeles" }}, fetchWithAuth: async () => ({{ ok: false }}) }};
+  card._render();
   return {{ svg: root.querySelector("svg").innerHTML, label: root.querySelector("svg").attrs["aria-label"] }};
 """
+
+
+def _at(hour: int, minute: int) -> float:
+    """Set the test's clock (and node's) to Wednesday 21 October 2026 at hour:minute in Los Angeles; return it."""
+    instant = datetime(2026, 10, 21, hour, minute, tzinfo=ZoneInfo("America/Los_Angeles")).timestamp()
+    ha_stub.set_clock(instant)
+    return instant
 
 
 def _limit_card(since: int, measured: int, untrusted: bool) -> dict:
@@ -109,19 +122,26 @@ def test_the_spoken_lo_hi_lines_hide_what_the_screen_hides():
 
 @needs_node
 def test_the_spoken_lo_hi_lines_name_the_day_as_the_screen_does():
-    """Since 26 hours: the screen says "yesterday at" (or the date shortly after midnight), and so does the text
-    description; the last measured value of another day is spoken with its day."""
-    out = _limit_card(26 * 3600, 3 * 86400, False)
-    screen = " ".join(t for t in out["svg"].split(">") if t)
-    label = out["label"]
-    if "Since yesterday at " in screen:
-        assert "Since yesterday at " in label
-    else:  # the start lies two calendar days back: its date, the month in full when spoken
-        assert "Since " in label and " at " in label.split("Since ", 1)[1]
-    assert "Last measured 52 milligrams per deciliter, " in label and " at " in label.split("Last measured", 1)[1]
-    # today: the clock time alone, as before
-    out = _limit_card(125 * 60, 127 * 60, False)
-    assert "Since yesterday" not in out["label"] and ", for 2 hours 5 minutes." in out["label"]
+    """The screen and the text description name the day of the start alike: the clock time alone today, "yesterday at"
+    the day before, the date (the month in full when spoken) further back; the last measured value of another day is
+    spoken with its day. On a fixed clock and time zone, so that the day does not depend on when the suite runs."""
+
+    def screen(out: dict) -> str:  # the screen's lines as one text (a wrapped line joined again)
+        return " ".join(re.findall(r"<text[^>]*>([^<]*)</text>", out["svg"]))
+
+    _at(12, 0)  # noon
+    out = _limit_card(125 * 60, 127 * 60, False)  # since 9:55 AM today
+    assert "Since 9:55 AM (2 h 5 min)" in screen(out)
+    assert "Since 9:55 AM, for 2 hours 5 minutes." in out["label"] and "yesterday" not in out["label"]
+    out = _limit_card(26 * 3600, 3 * 86400, False)  # since 10:00 AM yesterday; last measured three days back
+    assert "Since yesterday at 10:00 AM" in screen(out) and "Since yesterday at 10:00 AM, for " in out["label"]
+    assert "Last measured 52 milligrams per deciliter, October 18 at 12:00 PM" in out["label"]
+    _at(1, 6)  # shortly after midnight
+    out = _limit_card(125 * 60, 127 * 60, False)  # the same 2 h 5 min: since 11:01 PM the day before
+    assert "Since yesterday at 11:01 PM (2 h 5 min)" in screen(out)
+    assert "Since yesterday at 11:01 PM, for 2 hours 5 minutes." in out["label"]
+    out = _limit_card(26 * 3600, 3 * 86400, False)  # 26 hours: two calendar days back, its date
+    assert "Since October 19 at 11:06 PM, for " in out["label"]
 
 
 # ------------------------------------------------------------------------------------------------ failures logged once
