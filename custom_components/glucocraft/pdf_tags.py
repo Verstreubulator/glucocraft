@@ -287,15 +287,18 @@ class Tagger:
         return PDFStream(dictionary=header, content=xmp.encode("utf-8"), filters=[])
 
 
-# The XMP metadata packet (ISO 16684-1) with the Dublin Core title and language. It names no conformance (no
-# pdfuaid:part): a PDF/UA identification belongs only to a file that a PDF/UA validator has passed
-# (tools/check_pdf_ua.py).
+# The XMP metadata packet (ISO 16684-1) with the Dublin Core title and language and the PDF/UA identification
+# (PDF/UA-1, clause 5: pdfuaid:part 1). The identification is written because veraPDF's PDF/UA-1 profile passes the
+# reports (tools/check_pdf_ua.py, which reports any failed rule as a failure).
 _XMP_PACKET = (
     '<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
     '<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n'
     '<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/">\n'
     '<dc:title><rdf:Alt><rdf:li xml:lang="x-default">{title}</rdf:li></rdf:Alt></dc:title>\n'
     "<dc:language><rdf:Bag><rdf:li>{lang}</rdf:li></rdf:Bag></dc:language>\n"
+    "</rdf:Description>\n"
+    '<rdf:Description rdf:about="" xmlns:pdfuaid="http://www.aiim.org/pdfua/ns/id/">\n'
+    "<pdfuaid:part>1</pdfuaid:part>\n"
     "</rdf:Description></rdf:RDF></x:xmpmeta>\n"
     '<?xpacket end="w"?>'
 )

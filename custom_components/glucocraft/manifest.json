@@ -12,5 +12,5 @@
     "issue_tracker": "https://github.com/Verstreubulator/glucocraft/issues",
     "requirements": ["reportlab==4.2.5"],
     "single_config_entry": true,
-    "version": "0.0.3"
+    "version": "0.0.4"
 }

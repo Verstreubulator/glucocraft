@@ -13,10 +13,9 @@ Usage, from the repository root:
 veraPDF is found by the environment variable VERAPDF (the path of its command-line launcher), else as "verapdf" on the
 PATH. Exit status: 0 when every file is compliant, 1 when a file is not, 2 when veraPDF is not installed.
 
-The CGM Report names no PDF/UA conformance in its metadata (pdf_tags.py); veraPDF is asked for the PDF/UA-1 profile
-explicitly (--flavour ua1), so that it validates the files all the same. The rules of PDF/UA-1 clause 5, which ask for
-that identification (pdfuaid:part), therefore fail for every file; they are listed as expected, and a file passes when
-no other rule fails.
+The CGM Report states its PDF/UA identification in its metadata (pdfuaid:part 1, pdf_tags.py, written since
+veraPDF passed the reports); veraPDF is still asked for the PDF/UA-1 profile explicitly (--flavour ua1).
+A file passes when no rule fails.
 """
 
 from __future__ import annotations
@@ -31,8 +30,6 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-# PDF/UA-1 clause 5: the PDF/UA identification in the metadata, which the CGM Report leaves out on purpose (pdf_tags.py)
-EXPECTED_CLAUSES = frozenset({"5"})
 
 
 def find_verapdf() -> str | None:
@@ -61,10 +58,10 @@ def render_test_reports(folder: Path) -> list[Path]:
     return paths
 
 
-def results(mrr: str) -> list[tuple[str, bool, list[tuple[str, bool]]]]:
+def results(mrr: str) -> list[tuple[str, bool, list[str]]]:
     """Read veraPDF's machine-readable report: per file, its name, whether it passes, and its failed rules ("clause-test
-    (n checks): description", expected). A file passes when every failed rule is of an expected clause (clause 5:
-    the PDF/UA identification, left out on purpose). An unreadable report raises ET.ParseError."""
+    (n checks): description"). A file passes when veraPDF read it and no rule failed. An unreadable report raises
+    ET.ParseError."""
     out = []
     for job in ET.fromstring(mrr).iter("job"):
         item = job.find("item/name")
@@ -75,9 +72,9 @@ def results(mrr: str) -> list[tuple[str, bool, list[tuple[str, bool]]]]:
                 text = (
                     f"{rule.get('clause')}-{rule.get('testNumber')} ({rule.get('failedChecks')} checks): {description}"
                 )
-                failed.append((text, rule.get("clause") in EXPECTED_CLAUSES))
+                failed.append(text)
         report = job.find("validationReport")
-        ok = report is not None and all(expected for _, expected in failed)
+        ok = report is not None and not failed
         out.append((item.text if item is not None else "?", ok, failed))
     return out
 
@@ -100,8 +97,8 @@ def validate(verapdf: str, files: list[Path]) -> bool:
         return False
     for name, ok, failed in found:
         print(f"{'PASS' if ok else 'FAIL'}  {name}")
-        for text, expected in failed:
-            print(f"      {text}{'  (expected: no PDF/UA identification)' if expected else ''}")
+        for text in failed:
+            print(f"      {text}")
     return all(ok for _, ok, _ in found)
 
 

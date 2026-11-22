@@ -8,7 +8,7 @@ when it is installed (tools/check_pdf_ua.py); this test needs only pikepdf (requ
 
 Rules under test (docs/ACCESSIBILITY.md rule 4):
 - the document: /Lang (the catalogue's language), the title shown instead of the file name, /MarkInfo, the XMP title
-  and language, and no PDF/UA identification before a validator has passed the file;
+  and language, and the PDF/UA identification (pdfuaid:part 1, written since veraPDF passed the reports);
 - every page: /Tabs /S and /StructParents; every text, path, image and shading inside marked content, either tagged
   content (an MCID that the ParentTree maps to its structure element) or an artifact, never one inside the other;
 - the structure: one H1 first, headings that never skip a level, in the order of the page (top to bottom, left to
@@ -175,7 +175,7 @@ def test_document_language_title_and_marking(report):
     assert root.MarkInfo.Marked is True
     meta = tg.pdf.open_metadata()
     assert meta.get("dc:title") == str(tg.pdf.docinfo.Title) and "en" in str(meta.get("dc:language"))
-    assert meta.get("pdfuaid:part") is None  # no conformance claimed before veraPDF has passed the report
+    assert meta.get("pdfuaid:part") == "1"  # PDF/UA-1 identification: veraPDF passes the reports
     assert tg.pdf.pdf_version == "1.7"
 
 

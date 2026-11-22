@@ -1662,5 +1662,4 @@ The five example panel configurations (`glucocraft-*.yaml`), a starting configur
   system's own data can contain readings that did not reach GlucoCraft.
 - Weekday and month names come from the language catalogue, which is provided in English only; letters that are not
   in the panel fonts (for example of non-Latin scripts in the source name) are left out on the panels.
-- The wall panels are visual only, and the CGM Report PDF has not been validated against PDF/UA-1
-  (`ACCESSIBILITY.md`, Known limitations).
+- The example wall-panel configurations are visual only (`ACCESSIBILITY.md`, Known limitations).
