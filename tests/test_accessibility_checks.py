@@ -683,7 +683,8 @@ def test_documentation_accessibility_section():
     assert "These lines are not part of GlucoCraft" in flat and "HassGetState:" in flat and "{cite:haSentences}" in flat
     assert "GlucoCraft ships no voice intents" in flat and "never an alarm" not in flat and "not an alarm" not in flat
     assert "is tagged for screen readers" in flat and "4 full-screen black-and-white inversions" not in flat
-    assert "has not yet been validated against PDF/UA-1" in flat and "not tagged" not in flat
+    assert "passes the checks of PDF/UA-1" in flat and "names PDF/UA-1 in its metadata" in flat
+    assert "not yet been validated" not in flat and "not tagged" not in flat
     assert "2.3.1" not in flat
     assert "by its color only" not in flat  # the zone word is under the value in every setting
     assert "as bug reports at" in flat and "with the area <i>Accessibility</i>" in flat
@@ -707,9 +708,9 @@ def test_no_arrow_symbols_in_notification_examples_of_the_documentation():
 
 
 # ------------------------------------------------------------------------------------------------ the PDF/UA check
-def test_the_pdf_ua_check_lists_the_missing_identification_as_expected():
-    """tools/check_pdf_ua.py: the rules of PDF/UA-1 clause 5 (the identification, which the CGM Report leaves out on
-    purpose) are listed as expected; a file passes when no other rule fails."""
+def test_the_pdf_ua_check_fails_a_file_on_any_failed_rule():
+    """tools/check_pdf_ua.py: a file passes only when no rule fails; clause 5 (the identification, which the CGM Report
+    states since veraPDF passed it) is no exception any more."""
     import importlib.util
 
     spec = importlib.util.spec_from_file_location("check_pdf_ua", REPO / "tools" / "check_pdf_ua.py")
@@ -719,13 +720,15 @@ def test_the_pdf_ua_check_lists_the_missing_identification_as_expected():
     job = '<job><item><name>{name}</name></item><validationReport isCompliant="false"><details>{rules}</details></validationReport></job>'
     mrr = (
         "<report><jobs>"
-        + job.format(name="a.pdf", rules=rule.format(c="5", n="1", d="identification"))
+        + job.format(name="a.pdf", rules="")
+        + job.format(name="c.pdf", rules=rule.format(c="5", n="1", d="identification"))
         + job.format(
             name="b.pdf",
             rules=rule.format(c="5", n="1", d="identification") + rule.format(c="7.1", n="3", d="artifact"),
         )
         + "</jobs></report>"
     )
-    (a, a_ok, a_failed), (b, b_ok, b_failed) = tool.results(mrr)
-    assert (a, a_ok, [expected for _, expected in a_failed]) == ("a.pdf", True, [True])
-    assert (b, b_ok, [expected for _, expected in b_failed]) == ("b.pdf", False, [True, False])
+    (a, a_ok, a_failed), (c, c_ok, c_failed), (b, b_ok, b_failed) = tool.results(mrr)
+    assert (a, a_ok, a_failed) == ("a.pdf", True, [])
+    assert (c, c_ok, c_failed) == ("c.pdf", False, ["5-1 (1 checks): identification"])
+    assert (b, b_ok, len(b_failed)) == ("b.pdf", False, 2)

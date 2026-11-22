@@ -1,10 +1,11 @@
 # GlucoCraft accessibility rules
 
 These rules apply to every surface: the dashboard and the Documentation, the display cards, the CGM Report page and its
-PDF (Portable Document Format), the notifications, the Spoken summary sensor and the wall panels. They sit beside
-`LANGUAGE_STYLE.md` (wording). Every change is checked against them, and new work is not released until it follows them.
+PDF (Portable Document Format), the notifications, the Spoken summary sensor and the example wall-panel
+configurations (a panel is built and run by its owner; "the panels" below are panels built from these examples).
+They sit beside `LANGUAGE_STYLE.md` (wording). Every change is checked against them, and new work is not released until it follows them.
 They describe the accessibility work that is done; they are not a claim that GlucoCraft is accessible or meets a
-standard.
+standard. The one claim is the CGM Report PDF's PDF/UA-1 identification, which veraPDF checks (rule 4).
 Abbreviations: A1C, glycated hemoglobin; CV, coefficient of variation; GMI, glucose management indicator.
 
 ## Conformance
@@ -239,9 +240,9 @@ that continue on the next page ("<section> (continued)"); every section reads in
 the glucose sources that the page header names (an artifact) stand once in the text of About This Report; a text with a comparison sign
 carries its words as its actual text ("less than 4%"); its headings H1 and H2 are its bookmarks; it states its title
 and language (/Lang) and embeds its fonts. The CGM Report page and its PDF write "met" and "not met" as words (the
-dashboard's ✓ and ✗ are read as "meets" and "does not meet"). The PDF has not yet been
-validated against PDF/UA-1 (ISO 14289-1) and claims no PDF/UA conformance until a validator has passed it
-(`tools/check_pdf_ua.py`); the CGM Report page remains the alternative to the PDF.
+dashboard's ✓ and ✗ are read as "meets" and "does not meet"). The PDF passes veraPDF's
+PDF/UA-1 (ISO 14289-1) profile (`tools/check_pdf_ua.py`) and names PDF/UA-1 in its metadata
+(`pdfuaid:part` 1); the CGM Report page remains an alternative to the PDF.
 
 ## 5. Keyboard and focus
 
@@ -352,9 +353,10 @@ a custom palette never removes information.
   in the time format setting, never an age that would no longer be correct; a reading of an earlier day is named with
   its day ("Last reading yesterday at 9:45 PM.", or its date in the date format setting). It is disabled by default,
   because every new state is stored in the recorder. The Documentation explains how to enable it.
-- The wall panels are visual only: a screen reader cannot read them, and a person who is blind cannot use them. The
-  same pages are available on the display card, which has screen-reader text. The Documentation states this plainly,
-  without advice.
+- The example wall-panel configurations are visual only: a panel built from them cannot be read by a screen reader,
+  and a person who is blind cannot use it. The same pages are available on the display card, which has screen-reader
+  text, and the current value, its range and the trend can also be heard through the Spoken summary sensor (disabled
+  by default) and a voice assistant. The Documentation states this plainly, without advice.
 - The screen-reader rules (rule 4) apply to the dashboard, the display cards, the CGM Report page and the
   notifications, not to the wall panels.
 
@@ -384,9 +386,8 @@ read; people who use a screen reader can follow it and report where GlucoCraft d
 The same limitations, with their reasons and alternatives, are listed in the Documentation (Accessibility, *Known
 Limitations*).
 
-- The CGM Report PDF is tagged but has not yet been validated against PDF/UA-1; the CGM Report page is the
-  alternative to the PDF (rule 4).
-- The wall panels are visual only (rule 9); the display card shows the same pages with screen-reader text.
+- The example wall-panel configurations are visual only (rule 9); the display card shows the same pages with
+  screen-reader text.
 - 12 px text (rule 3): the statistics labels of the square 480 × 480 panel and the 3.5-inch 480 × 320 panel; on the
   3.5-inch panel also "TREND", "5 MIN DELTA", the source name, the weekly description line and the GMI value in both
   A1C units; and the statistics labels of the square display card.

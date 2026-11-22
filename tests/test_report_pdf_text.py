@@ -6,7 +6,7 @@ Rules under test (docs/ACCESSIBILITY.md rule 4, docs/DEVELOPER_GUIDE.md "Where e
   that a display in mmol/L rounds them once (72.5 mg/dL is 4.0 mmol/L; rounded to 73 mg/dL first, it would be 4.1).
 - In the PDF, ✓ and ✗ are real text: the words "met" and "not met".
 - The PDF sets its title, author, subject and language (/Lang) and is tagged (tests/test_pdf_tagging.py checks
-  its structure); it claims no PDF/UA conformance before a validator has passed it.
+  its structure); it states the PDF/UA-1 identification, which veraPDF passed (tools/check_pdf_ua.py).
 """
 
 from __future__ import annotations
@@ -110,6 +110,6 @@ def test_the_document_information_and_language(pdf):
     root = pdf.trailer["/Root"]
     assert root["/Lang"] == "en"
     assert root["/ViewerPreferences"]["/DisplayDocTitle"] in (True, "true")
-    # tagged: a structure tree and the "marked" flag; no PDF/UA identification in the metadata
+    # tagged: a structure tree and the "marked" flag; the PDF/UA-1 identification in the metadata
     assert "/StructTreeRoot" in root and root["/MarkInfo"]["/Marked"] in (True, "true")
-    assert b"pdfuaid" not in root["/Metadata"].get_data()
+    assert b"<pdfuaid:part>1</pdfuaid:part>" in root["/Metadata"].get_data()
