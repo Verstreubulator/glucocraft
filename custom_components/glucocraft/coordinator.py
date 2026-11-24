@@ -1325,7 +1325,8 @@ class GlucoCraftCoordinator(SourceNotices, DataUpdateCoordinator):
         else:
             self.hass.data[self.OUTAGE_LOGGED] = (reason, self.last_reading_ts)
         if reason == self.SOURCE_UNAVAILABLE:
-            _LOGGER.warning("GlucoCraft: the %s source, the source in use, is unavailable (no current data)", role)
+            # no "(no current data)" here: the flag follows the newest reading's age, which can still be fresh
+            _LOGGER.warning("GlucoCraft: the %s source, the source in use, is unavailable", role)
         elif reason == self.SOURCE_NO_CURRENT_DATA:
             _LOGGER.warning(
                 "GlucoCraft: no new reading from the %s source for more than %d minutes (no current data)",

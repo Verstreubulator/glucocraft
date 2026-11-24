@@ -32,11 +32,11 @@ HTTP API makes the same values available to GlucoCraft's own cards.
   (*Optional features* below) and those of a feature an update removed, so that none is left behind as "no longer
   provided". Only when both platforms set up without an error; logged at info with the count. Their recorded history
   and long-term statistics stay in the recorder.
-- **GlucoCraft keeps its entity ids.** The dashboard, the cards and the wall panels look for these ids (a panel's are in
-  its firmware), and Home Assistant cannot lock an id. So a change made while GlucoCraft runs, also through a new name for
-  the device, is undone 2 seconds after the last change, and the Repairs issue `entity_ids_put_back` says so. A
-  change found at setup, or one whose original id another entity has, stays for the user: `entity_ids_changed`.
-  Display names of the entities and the device are free. An automation pointing at these ids therefore keeps working.
+- **Keep GlucoCraft's entity ids.** The dashboard, the cards and the wall panels look for these ids (a panel's are in
+  its firmware), and Home Assistant cannot lock an id. A change of an id, also through a new name for the device, is
+  the user's choice and is left as it is: the fixable Repairs issue `entity_ids_changed` names it, 2 seconds
+  after the last change, and puts the original ids back on the user's confirmation. Display names of the entities and
+  the device are free.
 
 ## Icons and entity categories
 
@@ -434,12 +434,10 @@ Home Assistant *Repairs* (translation keys in `strings.json` `issues`):
   GlucoCraft is not loaded, the fix ends with `not_loaded` and the issue stays. A
   readings file whose records later than a year after the clock end the file in time order (at least 3 of them, or all
   its readings) is read as a clock that is behind, not as damage: the readings are kept and this issue applies.
-- `entity_ids_put_back`: an entity of GlucoCraft was given another id while GlucoCraft was running, and GlucoCraft gave the
-  original id back 2 seconds after the last change (the cards, the dashboard and the panels find the entities by those
-  ids); it lists them, 5 and then how many more; it is persistent: it stays, also across a restart, until the user
-  dismisses it, and a later change that is undone replaces it.
-- `entity_ids_changed` (fixable): an entity of GlucoCraft has another id that was not undone: a change found at setup, or
-  one whose original id another entity has; it lists the changed ids, 5 and then how many more; the fix gives the
+- `entity_ids_put_back`: no longer raised. In earlier versions it said that GlucoCraft had undone a change of an
+  entity id; it was persistent, so every setup deletes one that is left.
+- `entity_ids_changed` (fixable): an entity of GlucoCraft has another id than the one it was created with (found at
+  setup, or 2 seconds after the last change while GlucoCraft runs; never undone by itself); it lists the changed ids, 5 and then how many more; the fix gives the
   original ids back on the user's confirmation (an original id another entity has is left alone and the issue stays
   open); closes by itself when every id is the original one.
 - `source_mmol_too_high` (issue id `mmol_too_high_<entity_id>`): 10 readings in a row above 33.3 mmol/L from a source that

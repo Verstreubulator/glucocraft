@@ -831,12 +831,11 @@ characters as underscores>` (`entity_ids.py`; checked for every entity by `tests
 never change.
 
 **The ids are kept.** The cards, the dashboard and the panels find the entities by those ids, a panel's are in its
-firmware, and Home Assistant cannot lock an id. `renamed_entities.py` listens for changes of an id of GlucoCraft's
-entities and, 2 seconds after the last one (a device rename changes them one by one), gives the original ids back; the
-Repairs issue `entity_ids_put_back` lists them and stays, also across a restart, until the user dismisses it. A change
-found at setup is left alone,
-because the user may have pointed something at it since, and so is one whose original id another entity has: the fixable
-issue `entity_ids_changed` names those. While such a change stands, the display card and the panels show no
+firmware, and Home Assistant cannot lock an id. A change of an id is the user's choice and is left as it is:
+`renamed_entities.py`
+checks the ids at setup and 2 seconds after the last change of an id of GlucoCraft's entities (a device rename
+changes them one by one), and the fixable issue `entity_ids_changed` names every changed id and gives the original
+ids back on the user's confirmation; an original id another entity has is left alone. While such a change stands, the display card and the panels show no
 current data rather than an old number (`DISPLAY_CONTRACT.md`).
 
 ### Core Sensors (10)
@@ -1487,7 +1486,7 @@ https://github.com/yo-han/Home-Assistant-Carelink
 | File | Purpose |
 |------|---------|
 | `__init__.py` | Setup, platform forwarding, HTTP / webhook / frontend / dashboard / notification registration, actions, the entry-version check, removal |
-| `renamed_entities.py` | At every start and after a change of an id, the check of each entity's id against the id it was created with; the undoing of a change made while GlucoCraft runs, with the Repairs notice `entity_ids_put_back`; the Repairs notice `entity_ids_changed` and the putting back of the original ids for the rest. |
+| `renamed_entities.py` | At every start and 2 seconds after a change of an id, the check of each entity's id against the id it was created with; the Repairs notice `entity_ids_changed` and, on the user's confirmation, the putting back of the original ids (a change is never undone by itself). |
 | `source_rename.py` | The sources' settings follow a new entity id, from the entity registry's event: what is kept per source goes with it, and the entry reloads. |
 | `stale_entities.py` | At every start, the removal of the entity-registry entries of the entry that the setup did not create (an optional feature that is off, a feature removed by an update); their recorded history stays |
 | `config_flow.py` | Three-step config flow (with the step for readings kept from an earlier installation) and the options flow menu (eight screens) |
@@ -1611,7 +1610,7 @@ The five example panel configurations (`glucocraft-*.yaml`), a starting configur
   at the automatic limit itself, sent as numbers), `hand_limit_low` and `hand_limit_high` (numbers beyond a sensor limit
   set by hand), `expiry_entity_missing`, `expiry_entity_unrecognized` and `expiry_entity_past` (the sensor expiry entity
   does not exist, holds no expiry, or gives one long past), `source_mmol_too_high`, `source_time_attribute`,
-  `fast_source`, `clock_behind`, `entity_ids_changed` (an entity's id is not the one it was created with; `renamed_entities.py`), `entity_ids_put_back` (such a change was undone; `renamed_entities.py`), `source_mgdl_too_low` (a source stating mg/dL whose values look like mmol/L), `clock_ahead`, `storage_recovered`,
+  `fast_source`, `clock_behind`, `entity_ids_changed` (an entity's id is not the one it was created with; `renamed_entities.py`), `source_mgdl_too_low` (a source stating mg/dL whose values look like mmol/L), `clock_ahead`, `storage_recovered`,
   `storage_damaged`, `storage_unreadable`, `storage_save_failed` (the readings file could not be written), `storage_newer`, `storage_recovered_not_kept`, `storage_damaged_not_kept` (the storage keys
   except `storage_save_failed`, which is its own issue id, share the issue id `storage_problem`),
   `range_below_sensor_limit` and `range_above_sensor_limit`,

@@ -16,8 +16,8 @@ GlucoCraft is a Home Assistant custom integration designed to calculate and disp
 data provided by other integrations (statistics as defined in the published international consensus, a dashboard, a CGM
 Report with PDF (Portable Document Format) and printing, summary notifications, and data files for ESP32 wall panels).
 
-**Status:** pre-release (integration version 0.0.4). Not in the default catalog of Home Assistant's Marketplace
-or of HACS: install it as a custom repository ([Installation](#installation)).
+**Status:** pre-release (integration version 0.0.5). In the default catalog of Home Assistant's Marketplace and
+of HACS: search for GlucoCraft ([Installation](#installation)).
 
 ## Sources not supported for live display
 
@@ -109,13 +109,13 @@ section named in italics.
 
 ## Installation
 
-GlucoCraft is not in the default catalog of Home Assistant's Marketplace or of HACS. Once GlucoCraft is set up, the
+GlucoCraft is in the default catalog of Home Assistant's Marketplace and of HACS. Once GlucoCraft is set up, the
 Documentation page of its dashboard describes each step in full (*Installing, Updating and Removing GlucoCraft*).
 
-1. **Install** it as a custom repository with the category **Integration**: on Home Assistant 2026.11 and later, add
-   `https://github.com/Verstreubulator/glucocraft` in **Settings > Marketplace**; on 2026.3.1 to 2026.10, add `https://github.com/Verstreubulator/glucocraft` in HACS
-   (the menu (three dots) > **Custom repositories**), then open GlucoCraft in HACS and select
-   **Download**; or copy the folder `custom_components/glucocraft/` into the
+1. **Install** it: on Home Assistant 2026.11 and later, search for **GlucoCraft** in **Settings > Marketplace** and
+   install it; on 2026.3.1 to 2026.10, search for **GlucoCraft** in HACS and select **Download**. If the search does
+   not find it, add `https://github.com/Verstreubulator/glucocraft` as a custom repository with the category **Integration** (in HACS: the
+   menu (three dots) > **Custom repositories**). Or copy the folder `custom_components/glucocraft/` into the
    `custom_components/` folder of the configuration directory.
 
    On Home Assistant 2026.11 and later, this button opens GlucoCraft in the Marketplace of your own Home Assistant:
@@ -130,8 +130,8 @@ Documentation page of its dashboard describes each step in full (*Installing, Up
    stored readings are kept.
 4. **Remove** it: first choose under **Configure > Report and dashboard > When GlucoCraft is deleted** whether the
    readings are kept for a reinstall (the default) or deleted; then **Settings > Devices & services > GlucoCraft** > the
-   menu (three dots) > **Delete**, restart Home Assistant and remove GlucoCraft and its custom repository in the
-   Marketplace or in HACS (by hand: delete the folder). A new installation starts with the default settings, and every
+   menu (three dots) > **Delete**, restart Home Assistant and remove GlucoCraft in the Marketplace or in HACS, with
+   its custom repository if it was added as one (by hand: delete the folder). A new installation starts with the default settings, and every
    wall panel needs its new wall-panel address.
 
 ## Configuration
@@ -162,8 +162,9 @@ text as in Home Assistant (Documentation: *Notifications (Not Alarms)*).
 ## Entity names
 
 Every entity id starts with `glucocraft_` and every display name with "GlucoCraft" (docs/ENTITIES_AND_API.md).
-**GlucoCraft keeps its entity ids:** the dashboard, cards and wall panels look for these exact ids, so GlucoCraft gives
-a changed id back within seconds and says so in a Repairs notice. Names can be changed freely: change the *display
+**Keep GlucoCraft's entity ids:** the dashboard, cards and wall panels look for these exact ids. GlucoCraft leaves a
+changed id as it is and names it in a Repairs notice, which gives the original id back when it is submitted; until then
+the display card and the wall panels can show *No current data*. Names can be changed freely: change the *display
 name* of an entity or the device, and if Home Assistant offers to change the entity ids as well, leave them as they are.
 
 ## Wall panels
@@ -186,7 +187,7 @@ entities and folders of the installation; read it and remove names before sharin
 
 | Part | Version | Where it is set |
 |---|---|---|
-| Integration | 0.0.4 | `custom_components/glucocraft/manifest.json` (also the device version) |
+| Integration | 0.0.5 | `custom_components/glucocraft/manifest.json` (also the device version) |
 | Dashboard strategy | 0.0.1 | `www/glucocraft-strategy.js` |
 | Dashboard cards | 0.0.1 | `www/glucocraft-ui.js` |
 | Display card | 0.0.1 | `www/glucocraft-display-card.js` |

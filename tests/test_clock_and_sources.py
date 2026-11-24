@@ -443,9 +443,8 @@ class TestSourceLog:
         assert log() == []  # delivering: nothing to log
         c.hass.states.d["sensor.p"] = state("unavailable")
         c._async_state_changed(self._event("sensor.p", state("unavailable")))
-        assert log() == [
-            ("WARNING", "GlucoCraft: the primary source, the source in use, is unavailable (no current data)")
-        ]
+        assert log() == [("WARNING", "GlucoCraft: the primary source, the source in use, is unavailable")]
+        assert not c.no_current_data  # the newest reading is still fresh, so the line must not claim no current data
         for _ in range(3):  # the minute timer while it lasts, the data also becoming stale: no repeat
             c._set_stale(True)
         c._async_state_changed(self._event("sensor.p", state("unknown")))

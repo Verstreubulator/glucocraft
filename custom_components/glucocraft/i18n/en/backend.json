@@ -246,7 +246,6 @@
   "repairs.dashboard.not_ready": "Home Assistant's dashboards were not loaded yet",
   "repairs.entity_ids.line": "- `{current}`, originally `{original}`",
   "repairs.entity_ids.more.other": "- and {count} more",
-  "repairs.entity_ids.put_back_line": "- `{original}`, was changed to `{current}`",
   "repairs.resources.cannot_update": "Home Assistant does not allow it to be updated",
   "repairs.resources.not_updated": "these resources could not be updated: {resources}",
   "spoken.compare.at_least": "at least {value}",
