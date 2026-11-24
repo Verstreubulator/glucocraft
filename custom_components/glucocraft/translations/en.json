@@ -656,10 +656,6 @@
                 }
             }
         },
-        "entity_ids_put_back": {
-            "title": "GlucoCraft put its entity ids back",
-            "description": "These entities were given other ids, and GlucoCraft gave them their original ids back:\n\n{changed}\n\nGlucoCraft's cards, its dashboard and the wall panels find these entities by their original ids, so GlucoCraft keeps them. This is necessary so that GlucoCraft can continue to function properly. The name shown for an entity or a device can be changed freely: if Home Assistant offers to change the entity ids as well, leave them as they are. This notice stays until it is dismissed."
-        },
         "dashboard_failed": {
             "title": "GlucoCraft's dashboard could not be added",
             "description": "Home Assistant did not accept GlucoCraft's dashboard: {error}. The GlucoCraft dashboard is therefore not in the sidebar, and its pages, among them Documentation and CGM Report, cannot be opened. GlucoCraft's cards remain available to other dashboards, and the actions Print report and Export readings as CSV remain available. This can follow a Home Assistant update. GlucoCraft tries again at its next start (a restart of Home Assistant, or a reload of GlucoCraft); this notice closes by itself once the dashboard is added, or when *Dashboard in the sidebar* is turned off."

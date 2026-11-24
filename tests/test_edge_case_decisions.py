@@ -619,7 +619,6 @@ def test_keep_says_the_settings_are_not_kept():
     [
         ("source_mmol_too_high", {"entity"}),
         ("source_mgdl_too_low", {"entity"}),
-        ("entity_ids_put_back", {"changed"}),
         ("source_time_attribute", {"entity", "attribute"}),
         ("fast_source", {"entity"}),
     ],

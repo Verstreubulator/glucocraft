@@ -1,11 +1,11 @@
 # License: AGPL-3.0-only (LICENSE).
-"""An entity whose id was changed: the undoing, the Repairs notices, the fix flow and the display card.
+"""An entity whose id was changed: the Repairs notice, the fix flow and the display card.
 
 Rules under test:
-- A change made while GlucoCraft runs is undone shortly after, once for a whole device rename, and a notice says so; a
-  change of another integration's entity, and any other registry update, starts nothing.
-- A change found at setup stays for the user, also when a later change is undone; an original id another entity has is
-  left alone. Both are the fixable notice.
+- A change of an id is the user's choice and is never undone by itself: a change found at
+  setup and a change made while GlucoCraft runs both stay, and the fixable notice names them; for a change made while
+  GlucoCraft runs, shortly after, once for a whole device rename. A change of another integration's entity, and any
+  other registry update, starts nothing. The notice of earlier versions, which undid a change, is deleted at setup.
 - That notice opens while an entity's id is not the one it was created with, lists the first few and how many more, and
   closes by itself when every id is the original one.
 - The fix flow changes nothing until it is confirmed; it then gives the original ids back; an original id another
@@ -140,33 +140,31 @@ def rename(hass, old, new):
     )
 
 
-PUT_BACK = ("glucocraft", R.PUT_BACK_ISSUE_ID)
+OLD_PUT_BACK = ("glucocraft", R.OLD_PUT_BACK_ISSUE_ID)
 
 
 def test_a_change_found_at_setup_stays_for_the_user(hass, entry, monkeypatch):
     timers, _ = later_on(monkeypatch)
     REG.async_update_entity("sensor.glucocraft_a", new_entity_id="sensor.mine")
     R.async_setup_entity_id_watch(hass, entry)
-    assert ISSUE in ISSUES.issues and PUT_BACK not in ISSUES.issues  # at setup, without any event
+    assert ISSUE in ISSUES.issues  # at setup, without any event
     assert "sensor.mine" in REG.entities and timers == []
 
 
-def test_a_live_change_is_undone_and_a_notice_says_so(hass, entry, monkeypatch):
+def test_a_live_change_stays_and_the_notice_names_it(hass, entry, monkeypatch):
     timers, _ = later_on(monkeypatch)
     R.async_setup_entity_id_watch(hass, entry)
     rename(hass, "sensor.glucocraft_a", "sensor.mine")
-    assert "sensor.mine" in REG.entities  # not before the wait
+    assert ISSUE not in ISSUES.issues  # not before the wait
     timers[-1](None)
-    assert "sensor.glucocraft_a" in REG.entities and "sensor.mine" not in REG.entities
-    assert ISSUE not in ISSUES.issues
-    notice = ISSUES.issues[PUT_BACK]
-    assert notice.is_fixable is False and notice.is_persistent is True and notice.severity == "warning"
-    assert notice.translation_key == "entity_ids_put_back"
+    assert "sensor.mine" in REG.entities and "sensor.glucocraft_a" not in REG.entities  # never undone by itself
+    notice = ISSUES.issues[ISSUE]
+    assert notice.is_fixable is True and notice.severity == "error"
     text = notice.translation_placeholders["changed"]
-    assert "sensor.glucocraft_a" in text and "sensor.mine" in text
+    assert "sensor.glucocraft_a" in text and "sensor.mine" in text and "sensor.glucocraft_b" not in text
 
 
-def test_a_whole_device_rename_is_undone_once_with_one_notice(hass, entry, monkeypatch):
+def test_a_whole_device_rename_gives_one_notice(hass, entry, monkeypatch):
     """77 ids, as many as the install-test Home Assistant has; each change starts the wait again."""
     timers, cancelled = later_on(monkeypatch)
     made = [entity(f"n{i}", f"sensor.glucocraft_n{i}") for i in range(75)]
@@ -178,79 +176,57 @@ def test_a_whole_device_rename_is_undone_once_with_one_notice(hass, entry, monke
     for original in originals:
         rename(hass, original, original.replace("glucocraft", "renamed"))
     assert len(timers) == 77 and cancelled == timers[:-1]
-    timers[-1](None)
-    assert all(original in REG.entities for original in originals)
-    assert not any("renamed" in entity_id for entity_id in REG.entities)
-    lines = ISSUES.issues[PUT_BACK].translation_placeholders["changed"].split("\n")
-    assert len(lines) == R.SHOWN_IDS + 1 and "72 more" in lines[-1]
     assert ISSUE not in ISSUES.issues
-
-
-def test_changes_arriving_slowly_end_up_in_one_list(hass, entry, monkeypatch):
-    """A wait that ends in the middle of a device rename: the notice lists all of them, not the last group."""
-    timers, _ = later_on(monkeypatch)
-    R.async_setup_entity_id_watch(hass, entry)
-    rename(hass, "sensor.glucocraft_a", "sensor.mine")
     timers[-1](None)
-    rename(hass, "sensor.glucocraft_b", "sensor.mine_b")
-    timers[-1](None)
-    text = ISSUES.issues[PUT_BACK].translation_placeholders["changed"]
-    assert "sensor.mine" in text and "sensor.mine_b" in text
+    assert not any(original in REG.entities for original in originals)
+    lines = ISSUES.issues[ISSUE].translation_placeholders["changed"].split("\n")
+    assert len(lines) == R.SHOWN_IDS + 1 and "72 more" in lines[-1]
 
 
-def test_a_further_change_shows_again_after_the_notice_was_dismissed(hass, entry, monkeypatch):
-    timers, _ = later_on(monkeypatch)
-    R.async_setup_entity_id_watch(hass, entry)
-    rename(hass, "sensor.glucocraft_a", "sensor.mine")
-    timers[-1](None)
-    ISSUES.issues[PUT_BACK].dismissed_version = "2026.11.0"
-    rename(hass, "sensor.glucocraft_a", "sensor.mine2")
-    timers[-1](None)
-    assert ISSUES.issues[PUT_BACK].dismissed_version is None
-
-
-def test_undoing_a_live_change_leaves_a_change_found_at_setup(hass, entry, monkeypatch):
+def test_a_later_change_is_added_to_the_notice(hass, entry, monkeypatch):
     timers, _ = later_on(monkeypatch)
     REG.async_update_entity("sensor.glucocraft_a", new_entity_id="sensor.mine")
     R.async_setup_entity_id_watch(hass, entry)
     rename(hass, "sensor.glucocraft_b", "sensor.mine_b")
     timers[-1](None)
-    assert "sensor.mine" in REG.entities and "sensor.glucocraft_b" in REG.entities
-    assert ISSUE in ISSUES.issues and "sensor.mine_b" not in ISSUES.issues[ISSUE].translation_placeholders["changed"]
-    assert "sensor.mine" not in ISSUES.issues[PUT_BACK].translation_placeholders["changed"].replace("sensor.mine_b", "")
+    lines = ISSUES.issues[ISSUE].translation_placeholders["changed"].split("\n")
+    assert len(lines) == 2 and "sensor.glucocraft_a" in lines[0] and "sensor.glucocraft_b" in lines[1]
+    assert {"sensor.mine", "sensor.mine_b"} <= set(REG.entities)
 
 
-def test_a_live_change_whose_original_id_is_taken_stays_for_the_user(hass, entry, monkeypatch):
-    timers, _ = later_on(monkeypatch)
-    R.async_setup_entity_id_watch(hass, entry)
-    rename(hass, "sensor.glucocraft_a", "sensor.mine")
-    REG.put("sensor.glucocraft_a", "other_x", platform="other", config_entry_id="e2")
-    timers[-1](None)
-    assert "sensor.mine" in REG.entities and REG.entities["sensor.glucocraft_a"].unique_id == "other_x"
-    assert ISSUE in ISSUES.issues and PUT_BACK not in ISSUES.issues
-
-
-def test_undoing_its_own_change_undoes_nothing_further(hass, entry, monkeypatch):
-    """The undoing is itself a change of an id: its event starts one more wait, which finds nothing and says nothing."""
+def test_changing_the_id_back_by_hand_closes_the_notice(hass, entry, monkeypatch):
     timers, _ = later_on(monkeypatch)
     R.async_setup_entity_id_watch(hass, entry)
     rename(hass, "sensor.glucocraft_a", "sensor.mine")
     timers[-1](None)
-    ISSUES.issues.clear()
-    hass.bus.listeners[R.er.EVENT_ENTITY_REGISTRY_UPDATED](
-        types.SimpleNamespace(
-            data={"action": "update", "entity_id": "sensor.glucocraft_a", "old_entity_id": "sensor.mine"}
-        )
-    )
+    assert ISSUE in ISSUES.issues
+    rename(hass, "sensor.mine", "sensor.glucocraft_a")
     timers[-1](None)
-    assert ISSUES.issues == {} and "sensor.glucocraft_a" in REG.entities
+    assert ISSUE not in ISSUES.issues
 
 
-def test_the_put_back_text_lists_the_first_few_then_how_many_more():
-    pairs = {f"sensor.glucocraft_{i}": f"sensor.n{i}" for i in range(R.SHOWN_IDS + 2)}
-    lines = R.put_back_text(pairs).split("\n")
-    assert len(lines) == R.SHOWN_IDS + 1 and "2 more" in lines[-1]
-    assert "sensor.glucocraft_0" in lines[0] and "sensor.n0" in lines[0]
+def test_the_setup_deletes_the_notice_of_the_old_undoing(hass, entry, monkeypatch):
+    """A notice entity_ids_put_back left by an earlier version (persistent, so restored at the start)."""
+    later_on(monkeypatch)
+    ISSUES.create(*OLD_PUT_BACK, translation_key="entity_ids_put_back", is_persistent=True)
+    R.async_setup_entity_id_watch(hass, entry)
+    assert OLD_PUT_BACK not in ISSUES.issues
+
+
+def test_nothing_is_undone_anywhere():
+    """The watch only checks; only the fix flow, on confirmation, changes an id."""
+    src = (PKG / "renamed_entities.py").read_text(encoding="utf-8")
+    watch = src[src.index("def async_setup_entity_id_watch") :]
+    assert "async_put_back" not in watch and "async_update_entity" not in watch
+    assert "async_put_back(" in (PKG / "repairs.py").read_text(encoding="utf-8")
+
+
+def test_the_entity_has_public_properties_for_the_watch():
+    src = (PKG / "entity.py").read_text(encoding="utf-8")
+    assert "def unique_id(self) -> str:" in src and "def expected_entity_id(self) -> str:" in src
+    for name in ("stale_entities.py", "renamed_entities.py"):
+        text = (PKG / name).read_text(encoding="utf-8")
+        assert "._attr_unique_id" not in text and "._expected_entity_id" not in text, name
 
 
 @pytest.mark.parametrize(
@@ -327,11 +303,14 @@ def test_opening_the_fix_flow_after_the_ids_are_back_closes_the_notice(hass):
     assert ISSUE not in ISSUES.issues
 
 
-def test_the_documentation_describes_the_undoing():
+def test_the_documentation_describes_the_notice_and_no_undoing():
     docs = (PKG / "i18n" / "en" / "documentation.json").read_text(encoding="utf-8")
-    assert "GlucoCraft keeps its entity identifiers" in docs and "Do not rename" not in docs
-    assert docs.count("GlucoCraft put its entity ids back") >= 3  # Entity Names, Notifications and Troubleshooting
-    assert docs.count("Entity ids of GlucoCraft were changed") >= 2  # Notifications and Troubleshooting
+    readme = (REPO / "README.md").read_text(encoding="utf-8")
+    assert "Keep GlucoCraft's entity identifiers" in docs and "Do not rename" not in docs
+    assert docs.count("Entity ids of GlucoCraft were changed") >= 3  # Entity Names, Notifications and Troubleshooting
+    for text in (docs, readme, (PKG / "strings.json").read_text(encoding="utf-8")):
+        assert "put its entity ids back" not in text and "within seconds" not in text
+    assert "leaves a\nchanged id as it is" in readme
 
 
 def test_the_texts_say_what_the_fix_does_and_what_it_leaves():
