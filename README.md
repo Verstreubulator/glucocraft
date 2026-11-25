@@ -175,6 +175,11 @@ ESP32-S3-Touch-LCD-5, ESP32-S3-Touch-LCD-7 and ESP32-P4-WIFI6-Touch-LCD-7B); pre
 local network, so its data are only as private as the home network. Adding, building, removing and security:
 [docs/PANELS.md](docs/PANELS.md).
 
+## Display examples from testers
+
+Displays that testers have built for GlucoCraft's data are listed in [docs/DISPLAY_EXAMPLES.md](docs/DISPLAY_EXAMPLES.md).
+They are not part of GlucoCraft.
+
 ## Troubleshooting and known limitations
 
 The Documentation sections *Troubleshooting* and *Known Limitations* list the usual symptoms and checks and the known

@@ -120,7 +120,8 @@ README, on the first setup screen (as plain text; Submit continues), in the Docu
 *About This Report* on the CGM Report page and in its PDF, and in CONTRIBUTING.md. The short form (`const.py`
 DISCLAIMER_SHORT), the same substance in fewer words, stands where the screen holds no more: the About page of the
 display cards and the wall panels (with GlucoCraft's icon, the version line and the copyright line; page 17 of 17 on
-the display card). Where there is no room for either, one line (`const.py` DISCLAIMER_LINE) stands for it: the
+the display card) and the top of *Display Examples from Testers* (`docs/DISPLAY_EXAMPLES.md`). Where there is no room for
+either, one line (`const.py` DISCLAIMER_LINE) stands for it: the top of the *Share a display* issue form, the
 footer of every dashboard page ("For development and testing only. Not for medical use." with a link to the full
 text, *Disclaimer*) and the wall panels' start-up screen (with the icon, the name and the version); the PDF's page
 footer puts the name before it ("GlucoCraft. For development and testing only. Not for medical use."). Every summary

@@ -1,0 +1,61 @@
+name: Share a display
+description: A display built by a tester that shows GlucoCraft's data, for the list in docs/DISPLAY_EXAMPLES.md.
+labels: ["display"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For development and testing only. Not for medical use.
+
+        Submissions are about testing, developing and displaying GlucoCraft's data; posts about diagnosing, treating
+        or managing diabetes are outside this project's topics and are closed. Issues are public: do not include health
+        information, names, addresses, tokens or passwords. A picture that shows glucose values is health information.
+  - type: input
+    id: name
+    attributes:
+      label: Name of the display
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      description: The display's own public repository or page.
+    validations:
+      required: true
+  - type: textarea
+    id: shows
+    attributes:
+      label: What it shows
+      description: Which of GlucoCraft's data the display shows, and how (for example colors on an LED strip, or a screen).
+    validations:
+      required: true
+  - type: input
+    id: entities
+    attributes:
+      label: GlucoCraft entities it reads
+      placeholder: sensor.glucocraft_last_glucose_reading
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware (optional)
+  - type: input
+    id: license
+    attributes:
+      label: License
+      description: The open-source license the display is published under.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: The display is my own work.
+          required: true
+        - label: It is published under an open-source license.
+          required: true
+        - label: Its own description presents it as a display of GlucoCraft's data only.
+          required: true

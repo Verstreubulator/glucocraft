@@ -87,6 +87,19 @@ def test_the_readme_and_contributing_carry_the_disclaimer_once_in_full(name):
     assert _flat(text).count("Its notifications are not alarms.") == 1, name
 
 
+def test_the_display_examples_page_and_its_form_carry_the_short_form_and_the_line():
+    """docs/DISPLAY_EXAMPLES.md opens with the short form, once; the Share a display form opens with the one line."""
+    text = (REPO / "docs" / "DISPLAY_EXAMPLES.md").read_text(encoding="utf-8")
+    quoted = [q for q in _quoted(text) if "development and testing only" in q]
+    assert [_flat(q) for q in quoted] == [SHORT]
+    assert quoted[0].startswith("**For development and testing only.**")
+    assert _flat(text).count("Its notifications are not alarms.") == 1
+    form = yaml.safe_load((REPO / ".github" / "ISSUE_TEMPLATE" / "display_submission.yml").read_text(encoding="utf-8"))
+    intro = form["body"][0]["attributes"]["value"]
+    assert intro.strip().splitlines()[0] == LINE
+    assert _flat(intro).count("development and testing only") == 1
+
+
 def test_the_catalogue_copy_is_the_same_text():
     """The report page and the Documentation show the catalogue's disclaimer.text (the long form); the display card's
     About page shows disclaimer.short (the short form, as on the panels)."""

@@ -59,8 +59,9 @@ privately, as described in [SECURITY.md](SECURITY.md).
 
 ## Where to report
 
-Reports, questions and proposals are made on GitHub: **Issues** for bug reports, test reports and translation offers,
-**Discussions** for questions and ideas, and private vulnerability reporting for security issues.
+Reports, questions and proposals are made on GitHub: **Issues** for bug reports, test reports, translation offers and
+displays to be listed, **Discussions** for questions and ideas, and private vulnerability reporting for security
+issues.
 
 ## Developer setup
 
@@ -89,6 +90,20 @@ fragments. Right-to-left languages are not supported: the cards, the report and 
 layout.
 
 To offer a translation, open a **Translation offer** issue; the translation itself then comes as a pull request.
+
+## Sharing a display
+
+A display that a tester has built for GlucoCraft's data can be listed in
+[docs/DISPLAY_EXAMPLES.md](docs/DISPLAY_EXAMPLES.md). Submissions are about testing, developing and displaying
+GlucoCraft's data; diagnosing, treating or managing diabetes, treatment decisions and personal health information are
+outside this project's topics, and submissions about them are closed.
+
+To submit a display, publish it in its own public repository under an open-source license and open a **Share a
+display** issue. The GlucoCraft authors write the short description in the list. The display remains its author's
+work and is maintained by its author.
+
+A display can use any open-source license; a display that contains code taken from GlucoCraft (for example from the
+example panel configurations) is published under the GNU AGPL-3.0-only, GlucoCraft's license.
 
 ## Pull requests
 
